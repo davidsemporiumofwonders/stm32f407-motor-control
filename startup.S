@@ -9,113 +9,113 @@
 
 .global reset_handler
 .global default_handler
-.global g_pfnVectors
+.global Vectors
 
 .section .vector_table,"a",%progbits
-.type  g_pfnVectors, %object
-.size  g_pfnVectors, .-g_pfnVectors//why?, aslo on the functions?
+.type  Vectors, %object
+.size  Vectors, .-Vectors//why?, aslo on the functions?
 
-g_pfnVectors:
-	.word  _estack
-	.word  reset_handler
-	.word  NMI_Handler
-  	.word  HardFault_Handler
-  	.word  MemManage_Handler
-  	.word  BusFault_Handler
-  	.word  UsageFault_Handler
-  	.word  0
-  	.word  0
-  	.word  0
-  	.word  0
-  	.word  SVC_Handler
-  	.word  DebugMon_Handler
-  	.word  0
-  	.word  PendSV_Handler
-  	.word  SysTick_Handler
+Vectors:
+	.4byte  _estack
+	.4byte  reset_handler
+	.4byte  NMI_Handler
+  	.4byte  HardFault_Handler
+  	.4byte  MemManage_Handler
+  	.4byte  BusFault_Handler
+  	.4byte  UsageFault_Handler
+  	.4byte  0
+  	.4byte  0
+  	.4byte  0
+  	.4byte  0
+  	.4byte  SVC_Handler
+  	.4byte  DebugMon_Handler
+  	.4byte  0
+  	.4byte  PendSV_Handler
+  	.4byte  SysTick_Handler
 
   /* External Interrupts */
-  	.word     WWDG_IRQHandler                   /* Window WatchDog              */
-  	.word     PVD_IRQHandler                    /* PVD through EXTI Line detection */
-  	.word     TAMP_STAMP_IRQHandler             /* Tamper and TimeStamps through the EXTI line */
-  	.word     RTC_WKUP_IRQHandler               /* RTC Wakeup through the EXTI line */
-  	.word     FLASH_IRQHandler                  /* FLASH                        */
-  	.word     RCC_IRQHandler                    /* RCC                          */
-  	.word     EXTI0_IRQHandler                  /* EXTI Line0                   */
-  	.word     EXTI1_IRQHandler                  /* EXTI Line1                   */
-  	.word     EXTI2_IRQHandler                  /* EXTI Line2                   */
-  	.word     EXTI3_IRQHandler                  /* EXTI Line3                   */
-  	.word     EXTI4_IRQHandler                  /* EXTI Line4                   */
-  	.word     DMA1_Stream0_IRQHandler           /* DMA1 Stream 0                */
-  	.word     DMA1_Stream1_IRQHandler           /* DMA1 Stream 1                */
-  	.word     DMA1_Stream2_IRQHandler           /* DMA1 Stream 2                */
-  	.word     DMA1_Stream3_IRQHandler           /* DMA1 Stream 3                */
-  	.word     DMA1_Stream4_IRQHandler           /* DMA1 Stream 4                */
-  	.word     DMA1_Stream5_IRQHandler           /* DMA1 Stream 5                */
-  	.word     DMA1_Stream6_IRQHandler           /* DMA1 Stream 6                */
-  	.word     ADC_IRQHandler                    /* ADC1, ADC2 and ADC3s         */
-  	.word     CAN1_TX_IRQHandler                /* CAN1 TX                      */
-  	.word     CAN1_RX0_IRQHandler               /* CAN1 RX0                     */
-  	.word     CAN1_RX1_IRQHandler               /* CAN1 RX1                     */
-  	.word     CAN1_SCE_IRQHandler               /* CAN1 SCE                     */
-  	.word     EXTI9_5_IRQHandler                /* External Line[9:5]s          */
-  	.word     TIM1_BRK_TIM9_IRQHandler          /* TIM1 Break and TIM9          */
-  	.word     TIM1_UP_TIM10_IRQHandler          /* TIM1 Update and TIM10        */
-  	.word     TIM1_TRG_COM_TIM11_IRQHandler     /* TIM1 Trigger and Commutation and TIM11 */
-  	.word     TIM1_CC_IRQHandler                /* TIM1 Capture Compare         */
-  	.word     TIM2_IRQHandler                   /* TIM2                         */
-  	.word     TIM3_IRQHandler                   /* TIM3                         */
-  	.word     TIM4_IRQHandler                   /* TIM4                         */
-  	.word     I2C1_EV_IRQHandler                /* I2C1 Event                   */
-  	.word     I2C1_ER_IRQHandler                /* I2C1 Error                   */
-  	.word     I2C2_EV_IRQHandler                /* I2C2 Event                   */
-  	.word     I2C2_ER_IRQHandler                /* I2C2 Error                   */
-  	.word     SPI1_IRQHandler                   /* SPI1                         */
-  	.word     SPI2_IRQHandler                   /* SPI2                         */
-  	.word     USART1_IRQHandler                 /* USART1                       */
-  	.word     USART2_IRQHandler                 /* USART2                       */
-  	.word     USART3_IRQHandler                 /* USART3                       */
-  	.word     EXTI15_10_IRQHandler              /* External Line[15:10]s        */
-  	.word     RTC_Alarm_IRQHandler              /* RTC Alarm (A and B) through EXTI Line */
-  	.word     OTG_FS_WKUP_IRQHandler            /* USB OTG FS Wakeup through EXTI line */
-  	.word     TIM8_BRK_TIM12_IRQHandler         /* TIM8 Break and TIM12         */
-  	.word     TIM8_UP_TIM13_IRQHandler          /* TIM8 Update and TIM13        */
-  	.word     TIM8_TRG_COM_TIM14_IRQHandler     /* TIM8 Trigger and Commutation and TIM14 */
-  	.word     TIM8_CC_IRQHandler                /* TIM8 Capture Compare         */
-  	.word     DMA1_Stream7_IRQHandler           /* DMA1 Stream7                 */
-  	.word     FSMC_IRQHandler                   /* FSMC                         */
-  	.word     SDIO_IRQHandler                   /* SDIO                         */
-  	.word     TIM5_IRQHandler                   /* TIM5                         */
-  	.word     SPI3_IRQHandler                   /* SPI3                         */
-  	.word     UART4_IRQHandler                  /* UART4                        */
-  	.word     UART5_IRQHandler                  /* UART5                        */
-  	.word     TIM6_DAC_IRQHandler               /* TIM6 and DAC1&2 underrun errors */
-  	.word     TIM7_IRQHandler                   /* TIM7                         */
-  	.word     DMA2_Stream0_IRQHandler           /* DMA2 Stream 0                */
-  	.word     DMA2_Stream1_IRQHandler           /* DMA2 Stream 1                */
-  	.word     DMA2_Stream2_IRQHandler           /* DMA2 Stream 2                */
-  	.word     DMA2_Stream3_IRQHandler           /* DMA2 Stream 3                */
-  	.word     DMA2_Stream4_IRQHandler           /* DMA2 Stream 4                */
-  	.word     ETH_IRQHandler                    /* Ethernet                     */
-  	.word     ETH_WKUP_IRQHandler               /* Ethernet Wakeup through EXTI line */
-  	.word     CAN2_TX_IRQHandler                /* CAN2 TX                      */
-  	.word     CAN2_RX0_IRQHandler               /* CAN2 RX0                     */
-  	.word     CAN2_RX1_IRQHandler               /* CAN2 RX1                     */
-  	.word     CAN2_SCE_IRQHandler               /* CAN2 SCE                     */
-  	.word     OTG_FS_IRQHandler                 /* USB OTG FS                   */
-  	.word     DMA2_Stream5_IRQHandler           /* DMA2 Stream 5                */
-  	.word     DMA2_Stream6_IRQHandler           /* DMA2 Stream 6                */
-  	.word     DMA2_Stream7_IRQHandler           /* DMA2 Stream 7                */
-  	.word     USART6_IRQHandler                 /* USART6                       */
-  	.word     I2C3_EV_IRQHandler                /* I2C3 event                   */
-  	.word     I2C3_ER_IRQHandler                /* I2C3 error                   */
-  	.word     OTG_HS_EP1_OUT_IRQHandler         /* USB OTG HS End Point 1 Out   */
-  	.word     OTG_HS_EP1_IN_IRQHandler          /* USB OTG HS End Point 1 In    */
-  	.word     OTG_HS_WKUP_IRQHandler            /* USB OTG HS Wakeup through EXTI */
-  	.word     OTG_HS_IRQHandler                 /* USB OTG HS                   */
-  	.word     DCMI_IRQHandler                   /* DCMI                         */
-  	.word     CRYP_IRQHandler                   /* CRYP crypto                  */
-  	.word     HASH_RNG_IRQHandler               /* Hash and Rng                 */
-  	.word     FPU_IRQHandler                    /* FPU                          */
+  	.4byte     WWDG_IRQHandler                   /* Window WatchDog              */
+  	.4byte     PVD_IRQHandler                    /* PVD through EXTI Line detection */
+  	.4byte     TAMP_STAMP_IRQHandler             /* Tamper and TimeStamps through the EXTI line */
+  	.4byte     RTC_WKUP_IRQHandler               /* RTC Wakeup through the EXTI line */
+  	.4byte     FLASH_IRQHandler                  /* FLASH                        */
+  	.4byte     RCC_IRQHandler                    /* RCC                          */
+  	.4byte     EXTI0_IRQHandler                  /* EXTI Line0                   */
+  	.4byte     EXTI1_IRQHandler                  /* EXTI Line1                   */
+  	.4byte     EXTI2_IRQHandler                  /* EXTI Line2                   */
+  	.4byte     EXTI3_IRQHandler                  /* EXTI Line3                   */
+  	.4byte     EXTI4_IRQHandler                  /* EXTI Line4                   */
+  	.4byte     DMA1_Stream0_IRQHandler           /* DMA1 Stream 0                */
+  	.4byte     DMA1_Stream1_IRQHandler           /* DMA1 Stream 1                */
+  	.4byte     DMA1_Stream2_IRQHandler           /* DMA1 Stream 2                */
+  	.4byte     DMA1_Stream3_IRQHandler           /* DMA1 Stream 3                */
+  	.4byte     DMA1_Stream4_IRQHandler           /* DMA1 Stream 4                */
+  	.4byte     DMA1_Stream5_IRQHandler           /* DMA1 Stream 5                */
+  	.4byte     DMA1_Stream6_IRQHandler           /* DMA1 Stream 6                */
+  	.4byte     ADC_IRQHandler                    /* ADC1, ADC2 and ADC3s         */
+  	.4byte     CAN1_TX_IRQHandler                /* CAN1 TX                      */
+  	.4byte     CAN1_RX0_IRQHandler               /* CAN1 RX0                     */
+  	.4byte     CAN1_RX1_IRQHandler               /* CAN1 RX1                     */
+  	.4byte     CAN1_SCE_IRQHandler               /* CAN1 SCE                     */
+  	.4byte     EXTI9_5_IRQHandler                /* External Line[9:5]s          */
+  	.4byte     TIM1_BRK_TIM9_IRQHandler          /* TIM1 Break and TIM9          */
+  	.4byte     TIM1_UP_TIM10_IRQHandler          /* TIM1 Update and TIM10        */
+  	.4byte     TIM1_TRG_COM_TIM11_IRQHandler     /* TIM1 Trigger and Commutation and TIM11 */
+  	.4byte     TIM1_CC_IRQHandler                /* TIM1 Capture Compare         */
+  	.4byte     TIM2_IRQHandler                   /* TIM2                         */
+  	.4byte     TIM3_IRQHandler                   /* TIM3                         */
+  	.4byte     TIM4_IRQHandler                   /* TIM4                         */
+  	.4byte     I2C1_EV_IRQHandler                /* I2C1 Event                   */
+  	.4byte     I2C1_ER_IRQHandler                /* I2C1 Error                   */
+  	.4byte     I2C2_EV_IRQHandler                /* I2C2 Event                   */
+  	.4byte     I2C2_ER_IRQHandler                /* I2C2 Error                   */
+  	.4byte     SPI1_IRQHandler                   /* SPI1                         */
+  	.4byte     SPI2_IRQHandler                   /* SPI2                         */
+  	.4byte     USART1_IRQHandler                 /* USART1                       */
+  	.4byte     USART2_IRQHandler                 /* USART2                       */
+  	.4byte     USART3_IRQHandler                 /* USART3                       */
+  	.4byte     EXTI15_10_IRQHandler              /* External Line[15:10]s        */
+  	.4byte     RTC_Alarm_IRQHandler              /* RTC Alarm (A and B) through EXTI Line */
+  	.4byte     OTG_FS_WKUP_IRQHandler            /* USB OTG FS Wakeup through EXTI line */
+  	.4byte     TIM8_BRK_TIM12_IRQHandler         /* TIM8 Break and TIM12         */
+  	.4byte     TIM8_UP_TIM13_IRQHandler          /* TIM8 Update and TIM13        */
+  	.4byte     TIM8_TRG_COM_TIM14_IRQHandler     /* TIM8 Trigger and Commutation and TIM14 */
+  	.4byte     TIM8_CC_IRQHandler                /* TIM8 Capture Compare         */
+  	.4byte     DMA1_Stream7_IRQHandler           /* DMA1 Stream7                 */
+  	.4byte     FSMC_IRQHandler                   /* FSMC                         */
+  	.4byte     SDIO_IRQHandler                   /* SDIO                         */
+  	.4byte     TIM5_IRQHandler                   /* TIM5                         */
+  	.4byte     SPI3_IRQHandler                   /* SPI3                         */
+  	.4byte     UART4_IRQHandler                  /* UART4                        */
+  	.4byte     UART5_IRQHandler                  /* UART5                        */
+  	.4byte     TIM6_DAC_IRQHandler               /* TIM6 and DAC1&2 underrun errors */
+  	.4byte     TIM7_IRQHandler                   /* TIM7                         */
+  	.4byte     DMA2_Stream0_IRQHandler           /* DMA2 Stream 0                */
+  	.4byte     DMA2_Stream1_IRQHandler           /* DMA2 Stream 1                */
+  	.4byte     DMA2_Stream2_IRQHandler           /* DMA2 Stream 2                */
+  	.4byte     DMA2_Stream3_IRQHandler           /* DMA2 Stream 3                */
+  	.4byte     DMA2_Stream4_IRQHandler           /* DMA2 Stream 4                */
+  	.4byte     ETH_IRQHandler                    /* Ethernet                     */
+  	.4byte     ETH_WKUP_IRQHandler               /* Ethernet Wakeup through EXTI line */
+  	.4byte     CAN2_TX_IRQHandler                /* CAN2 TX                      */
+  	.4byte     CAN2_RX0_IRQHandler               /* CAN2 RX0                     */
+  	.4byte     CAN2_RX1_IRQHandler               /* CAN2 RX1                     */
+  	.4byte     CAN2_SCE_IRQHandler               /* CAN2 SCE                     */
+  	.4byte     OTG_FS_IRQHandler                 /* USB OTG FS                   */
+  	.4byte     DMA2_Stream5_IRQHandler           /* DMA2 Stream 5                */
+  	.4byte     DMA2_Stream6_IRQHandler           /* DMA2 Stream 6                */
+  	.4byte     DMA2_Stream7_IRQHandler           /* DMA2 Stream 7                */
+  	.4byte     USART6_IRQHandler                 /* USART6                       */
+  	.4byte     I2C3_EV_IRQHandler                /* I2C3 event                   */
+  	.4byte     I2C3_ER_IRQHandler                /* I2C3 error                   */
+  	.4byte     OTG_HS_EP1_OUT_IRQHandler         /* USB OTG HS End Point 1 Out   */
+  	.4byte     OTG_HS_EP1_IN_IRQHandler          /* USB OTG HS End Point 1 In    */
+  	.4byte     OTG_HS_WKUP_IRQHandler            /* USB OTG HS Wakeup through EXTI */
+  	.4byte     OTG_HS_IRQHandler                 /* USB OTG HS                   */
+  	.4byte     DCMI_IRQHandler                   /* DCMI                         */
+  	.4byte     CRYP_IRQHandler                   /* CRYP crypto                  */
+  	.4byte     HASH_RNG_IRQHandler               /* Hash and Rng                 */
+  	.4byte     FPU_IRQHandler                    /* FPU                          */
 
 /*******************************************************************************
 *
@@ -398,7 +398,7 @@ g_pfnVectors:
    .thumb_set FPU_IRQHandler,default_handler
 
 .section .text.reset_handler,"ax",%progbits
-.balign 4
+.balign 4//just align everything on 4 byte boudenry, flash is plentyfull
 .thumb_func
 	reset_handler:
 
@@ -420,11 +420,11 @@ g_pfnVectors:
 
 
 	b main
-	.balign 4
-	.pool//align pool?(i thins its not neccecairy when you use the 32 bit encoding of ldr), just use word?
+	.balign 4//unaligned loads and stores take an extra cycle
+	.pool
 
 .section .text.default_handler,"ax",%progbits
-.balign 2
-.thumb_func// different bc this is an interrupt?
+.balign 4
+.thumb_func
 	default_handler:
 	b.n default_handler

@@ -9,6 +9,7 @@
 .global fsqrt
 
 //contents of assemly funtions (even seperate files in general) are not visible to the compiler
+//use luts
 
 .section .text.svm_asm,"ax",%progbits
 .balign 4
