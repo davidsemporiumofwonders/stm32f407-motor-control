@@ -28,6 +28,7 @@
 //are we armv7e-m , checkout sel instruction
 //float accuracy
 //prolly dont need any context saving in the fpu
+//funtion inlining
 
 //first complete , then optimize!
 

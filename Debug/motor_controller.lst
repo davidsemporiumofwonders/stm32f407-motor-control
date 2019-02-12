@@ -115,6 +115,7 @@ SYMBOL TABLE:
 0800029c  w    F .text	00000000 RCC_IRQHandler
 0800029c  w    F .text	00000000 TIM8_BRK_TIM12_IRQHandler
 0800029c  w    F .text	00000000 EXTI15_10_IRQHandler
+08000000 g     O .text	00000000 Vectors
 0800029c  w    F .text	00000000 ADC_IRQHandler
 0800029c  w    F .text	00000000 DMA1_Stream7_IRQHandler
 08000188 g     F .text	00000000 fsine_cosine
@@ -148,7 +149,6 @@ SYMBOL TABLE:
 0800029c  w    F .text	00000000 EXTI1_IRQHandler
 20000000 g       .data	00000000 _edata
 0800029c  w    F .text	00000000 USART2_IRQHandler
-08000000 g     O .text	00000000 g_pfnVectors
 0800029c  w    F .text	00000000 I2C2_ER_IRQHandler
 0800029c  w    F .text	00000000 DMA2_Stream1_IRQHandler
 0800029c  w    F .text	00000000 CAN1_SCE_IRQHandler
@@ -167,7 +167,7 @@ SYMBOL TABLE:
 
 Disassembly of section .text:
 
-08000000 <g_pfnVectors>:
+08000000 <Vectors>:
  8000000:	00 00 03 20 6d 02 00 08 9d 02 00 08 9d 02 00 08     ... m...........
  8000010:	9d 02 00 08 9d 02 00 08 9d 02 00 08 00 00 00 00     ................
 	...
@@ -196,7 +196,7 @@ Disassembly of section .text:
 
 08000188 <fsine_cosine>:
 fsine_cosine():
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:42
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:43
 
 .section .text.fsine_cosine,"ax",%progbits
 .balign 4
@@ -204,82 +204,82 @@ fsine_cosine():
 	fsine_cosine://once again 4th order calculates cosine dipshit
 	vcvt.u32.f32 s3,s3,#32
  8000188:	eeff 1ac0 	vcvt.u32.f32	s3, s3, #32
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:43
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:44
 	push {r3}//do this as an str to make use of store buffer? or will this happen anyway
  800018c:	b408      	push	{r3}
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:44
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:45
 	vmov r3,s3
  800018e:	ee11 3a90 	vmov	r3, s3
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:45
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:46
 	vcvt.f32.u32 s3,s3,#32
  8000192:	eefb 1ac0 	vcvt.f32.u32	s3, s3, #32
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:46
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:47
 	vmov.f32 s5,s3//do that branch differently?
  8000196:	eef0 2a61 	vmov.f32	s5, s3
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:47
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:48
 	lsls.n r3,r3,#1
  800019a:	005b      	lsls	r3, r3, #1
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:48
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:49
 	ite mi
  800019c:	bf4c      	ite	mi
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:49
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:50
 	vsubmi.f32 s3,s0,s3
  800019e:	ee70 1a61 	vsubmi.f32	s3, s0, s3
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:50
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:51
 	vsubpl.f32 s5,s0,s5
  80001a2:	ee70 2a62 	vsubpl.f32	s5, s0, s5
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:51
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:52
 	vmul.f32 s3,s3,s3//x^2
  80001a6:	ee61 1aa1 	vmul.f32	s3, s3, s3
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:52
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:53
 	vmul.f32 s5,s5,s5//x^2
  80001aa:	ee62 2aa2 	vmul.f32	s5, s5, s5
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:53
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:54
 	vmul.f32 s4,s3,s2//x^2*c
  80001ae:	ee21 2a81 	vmul.f32	s4, s3, s2
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:54
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:55
 	vmul.f32 s6,s5,s2//x^2*c
  80001b2:	ee22 3a81 	vmul.f32	s6, s5, s2
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:55
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:56
 	vsub.f32 s4,s1,s4//b-x^2*c
  80001b6:	ee30 2ac2 	vsub.f32	s4, s1, s4
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:56
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:57
 	vsub.f32 s6,s1,s6//b-x^2*c
  80001ba:	ee30 3ac3 	vsub.f32	s6, s1, s6
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:57
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:58
 	vmul.f32 s4,s4,s3
  80001be:	ee22 2a21 	vmul.f32	s4, s4, s3
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:58
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:59
 	vmul.f32 s6,s6,s5
  80001c2:	ee23 3a22 	vmul.f32	s6, s6, s5
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:59
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:60
 	vsub.f32 s4,s0,s4
  80001c6:	ee30 2a42 	vsub.f32	s4, s0, s4
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:60
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:61
 	vsub.f32 s6,s0,s6
  80001ca:	ee30 3a43 	vsub.f32	s6, s0, s6
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:61
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:62
 	pop {r3}
  80001ce:	bc08      	pop	{r3}
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:62
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:63
 	itt cs
  80001d0:	bf24      	itt	cs
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:63
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:64
 	vnegcs.f32 s4,s4
  80001d2:	eeb1 2a42 	vnegcs.f32	s4, s4
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:64
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:65
 	vnegcs.f32 s6,s6
  80001d6:	eeb1 3a43 	vnegcs.f32	s6, s6
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:65
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:66
 	it mi
  80001da:	bf48      	it	mi
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:66
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:67
 	vnegmi.f32 s6,s6
  80001dc:	eeb1 3a43 	vnegmi.f32	s6, s6
 
 080001e0 <finvtan2>:
 finvtan2():
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:73
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:74
 
 .section .text.finvtan2,"ax",%progbits
 .balign 4
@@ -291,7 +291,7 @@ finvtan2():
 
 080001e4 <fsqrt>:
 fsqrt():
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:79
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:80
 
 .section .text.fsqrt,"ax",%progbits
 .balign 4
@@ -352,7 +352,7 @@ void svm(){
 	rotor.x = adc_circ_buffer[0].v_rotor_x * hall_x_scaling;
  8000200:	4918      	ldr	r1, [pc, #96]	; (8000264 <TIM2_IRQHandler+0x78>)
 TIM2_IRQHandler():
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:209
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:208
 void wait(){
 
 }
@@ -369,7 +369,7 @@ svm():
 	rotor.x = adc_circ_buffer[0].v_rotor_x * hall_x_scaling;
  800020a:	b29b      	uxth	r3, r3
 TIM2_IRQHandler():
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:209
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:208
 void TIM2_IRQHandler(){
  800020c:	ed2d 8b02 	vpush	{d8}
 svm():
@@ -387,26 +387,26 @@ svm():
  800021c:	eeb8 8ae7 	vcvt.f32.s32	s16, s15
  8000220:	edd1 7a00 	vldr	s15, [r1]
 /home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:158
-	rotor_mag_ang.mag=fsqrt(rotor.x*rotor.x + rotor.y*rotor.y);//inline assembly
+	rotor_mag_ang.mag=fsqrt(rotor.x*rotor.x + rotor.y*rotor.y);
  8000224:	ee28 0aa8 	vmul.f32	s0, s17, s17
 /home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:154
 	rotor.x = adc_circ_buffer[0].v_rotor_x * hall_x_scaling;
  8000228:	ee28 8a27 	vmul.f32	s16, s16, s15
 TIM2_IRQHandler():
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:209
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:208
 void TIM2_IRQHandler(){
  800022c:	b083      	sub	sp, #12
 svm():
 /home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:158
-	rotor_mag_ang.mag=fsqrt(rotor.x*rotor.x + rotor.y*rotor.y);//inline assembly
+	rotor_mag_ang.mag=fsqrt(rotor.x*rotor.x + rotor.y*rotor.y);
  800022e:	eea8 0a08 	vfma.f32	s0, s16, s16
  8000232:	f7ff ffd7 	bl	80001e4 <fsqrt>
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:160
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:159
 	rotor_mag_ang.ang=finvtan2(rotor.x,rotor.y);
  8000236:	eef0 0a68 	vmov.f32	s1, s17
  800023a:	eeb0 0a48 	vmov.f32	s0, s16
  800023e:	f7ff ffcf 	bl	80001e0 <finvtan2>
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:169
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:168
 	fsine_cosine(rotor_mag_ang.ang + mtpa_lut[0][0],(float*) &ref.y,(float*) &ref.x);//get rid of the cos(the entire perspective switch really(how conducive are the corrections to this?)) by having the rotation lut return cos a and sin a
  8000242:	eddf 7a09 	vldr	s15, [pc, #36]	; 8000268 <TIM2_IRQHandler+0x7c>
  8000246:	4669      	mov	r1, sp
@@ -414,7 +414,7 @@ svm():
  800024c:	a801      	add	r0, sp, #4
  800024e:	f7ff ff9b 	bl	8000188 <fsine_cosine>
 TIM2_IRQHandler():
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:212
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:211
 	process_data();
 	svm();
 }
@@ -430,7 +430,7 @@ TIM2_IRQHandler():
 reset_handler():
 /home/david/Documents/workspace-arm/motor_controller/Debug/../startup.S:405
 .section .text.reset_handler,"ax",%progbits
-.balign 4
+.balign 4//just align everything on 4 byte boudenry, flash is plentyfull
 .thumb_func
 	reset_handler:
 
@@ -499,10 +499,9 @@ DMA1_Stream3_IRQHandler():
 /home/david/Documents/workspace-arm/motor_controller/Debug/../startup.S:430
 
 .section .text.default_handler,"ax",%progbits
-.balign 2
-.thumb_func// different bc this is an interrupt?
+.balign 4
+.thumb_func
 	default_handler:
 	b.n default_handler
  800029c:	e7fe      	b.n	800029c <default_handler>
- 800029e:	Address 0x000000000800029e is out of bounds.
-
+ 800029e:	bf00      	nop

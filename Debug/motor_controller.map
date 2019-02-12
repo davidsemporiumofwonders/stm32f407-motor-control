@@ -78,7 +78,7 @@ LOAD ./startup.o
  FILL mask 0xff
  *(.vector_table)
  .vector_table  0x0000000008000000      0x188 ./startup.o
-                0x0000000008000000                g_pfnVectors
+                0x0000000008000000                Vectors
                 0x0000000008000188                . = ALIGN (0x4)
  *(.text)
  *(.text.*)
@@ -100,7 +100,7 @@ LOAD ./startup.o
                 0x000000000800026c       0x30 ./startup.o
                 0x000000000800026c                reset_handler
  .text.default_handler
-                0x000000000800029c        0x2 ./startup.o
+                0x000000000800029c        0x4 ./startup.o
                 0x000000000800029c                RTC_Alarm_IRQHandler
                 0x000000000800029c                HASH_RNG_IRQHandler
                 0x000000000800029c                EXTI2_IRQHandler
@@ -196,11 +196,10 @@ LOAD ./startup.o
  *(.fini)
  *(.rodata*)
  *(.glue_7)
- .glue_7        0x000000000800029e        0x0 linker stubs
+ .glue_7        0x00000000080002a0        0x0 linker stubs
  *(.glue_7t)
- .glue_7t       0x000000000800029e        0x0 linker stubs
+ .glue_7t       0x00000000080002a0        0x0 linker stubs
                 0x00000000080002a0                . = ALIGN (0x4)
- *fill*         0x000000000800029e        0x2 ff
                 0x00000000080002a0                _etext = .
                 0x00000000080002a0                _sidata = _etext
 
