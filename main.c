@@ -1,15 +1,6 @@
 #include "stm32f4xx.h"
 #include "asm_functions.h"
 
-//this project is based around the method described on: http://build-its-inprogress.blogspot.nl/2017/05/vector-hysteresis-foc.html
-//my math is NOT(at all!) trustworthy enough to be doing this: evaluate it yourself alswell
-
-//12 o clock is 0 degrees, looking from output side
-//coil a is at 0 degrees other coils are named clock wise and placed in 120 degree increments
-//positive current on a coil means flowing out of the controller(from the phase connections, obviously not ground wiseguy) and the resultant magnetic field pointing outward from rotor axle
-//si units, angles in full revolutions
-//[0,0] is on rotor axle, x axis is horizontal(9 to 3 o'clock), y vertical, both axises(is that a word?) are fixed to the stator, incrementing to right and upwards repectively
-
 //field strength based on calulated speed
 //auto find phase ordering, polartity
 //absolute vs relative position?
@@ -29,8 +20,6 @@
 //float accuracy
 //prolly dont need any context saving in the fpu
 //funtion inlining
-
-//first complete , then optimize!
 
 #define radius_hysteresis_circle 1
 #define n_samples_averaging 1
@@ -58,13 +47,13 @@ typedef struct {
 	uint16_t v_rotor_y;
 }adc_conversions;
 
-volatile adc_conversions adc_circ_buffer[sizeof(adc_conversions)*n_samples_averaging] __attribute__ ((aligned (2)));
+volatile adc_conversions adc_circ_buffer[sizeof(adc_conversions)*n_samples_averaging] __attribute__ ((aligned (2)));//align on 4 bytes?
 
-const float mtpa_lut[][1];//datatype?, enough ram?, search algorithm?
+//cosine table
 
-const float rotary_resolver_correction_lut[];//needed?, datatype?
+const float mtpa_lut[][1];//datatype?, search algorithm?
 
-const uint8_t switch_states[] = {1,3,2,6,4,12};
+const uint8_t rotary_resolver_correction_lut[];//const gets placed in text! can be changed in linker
 
 const vector switch_state_vectors[] = { {0,0},
 										{0,0},
@@ -82,13 +71,16 @@ float uv_lockout_release;//floats?
 uint8_t n_polepairs;//pairs!, 8 bits?, constant?, technically this number should be npp/npp_sensemagnet
 float torque_per_amp;
 
-
 uint8_t faultcodes[8];//flash eeprom emulation
 uint8_t faultcodes_index;
 
 float hall_x_scaling;
 float hall_y_scaling;
-float requested_torque;// or pass this like this as arguments?
+float i_a;
+float i_b;
+float i_c;
+vector rotor;
+float volatile requested_torque;
 
 //prototypes
 void wait(void);
@@ -130,7 +122,7 @@ void field_controll(){
 void svm(){
 	// normalize hall?
 	//calculate the third coil current
-	float calced_cur_c = (float)(-adc_circ_buffer[1].i_a - adc_circ_buffer[1].i_b);
+	float i_c = (float)(-i_a - i_b);
 
 	//place currents in space
 	vector cur_a;
@@ -138,22 +130,16 @@ void svm(){
 	vector cur_c;
 
 	cur_a.x = 0;
-	cur_a.y = (float)(adc_circ_buffer[0].i_a);
-	cur_b.x = (float)(adc_circ_buffer[0].i_b)*cos120;
+	cur_a.y = (float)(i_a);
+	cur_b.x = (float)(i_b)*cos120;
 	cur_b.y = cur_b.x*-sin120/cos120;
-	cur_c.x = calced_cur_c*cos120;
-	cur_c.y = calced_cur_c*sin120;
+	cur_c.x = i_c*cos120;
+	cur_c.y = i_c*sin120;
 
 	//total current vector
 	vector cur_total;
 	cur_total.x = cur_a.x + cur_b.x + cur_c.x;
 	cur_total.y = cur_a.y + cur_b.y + cur_c.y;
-
-	//setup rotor vector in mag ang
-	vector rotor;
-
-	rotor.x = adc_circ_buffer[0].v_rotor_x * hall_x_scaling;
-	rotor.y = adc_circ_buffer[0].v_rotor_y * hall_y_scaling;
 
 	vector_mag_ang rotor_mag_ang;
 	rotor_mag_ang.mag=fsqrt(rotor.x*rotor.x + rotor.y*rotor.y);
@@ -166,9 +152,9 @@ void svm(){
 	//setup ref vector in xy
 	float temp = rotor_mag_ang.mag * requested_torque * torque_per_amp;
 	vector ref;
-	fsine_cosine(rotor_mag_ang.ang + mtpa_lut[0][0],(float*) &ref.y,(float*) &ref.x);//get rid of the cos(the entire perspective switch really(how conducive are the corrections to this?)) by having the rotation lut return cos a and sin a
-	ref.x *= temp;
-	ref.y *= temp;//scaling correct?
+	struct twofloats sine_cosine = fsine_cosine(rotor_mag_ang.ang + mtpa_lut[0][0]);//get rid of the cos(the entire perspective switch really(how conducive are the corrections to this?)) by having the rotation lut return cos a and sin a
+	ref.x = sine_cosine.value1*temp;//cosine and sine correctly paired?
+	ref.y = sine_cosine.value0*temp;//scaling correct?
 	//get error
 	vector error;
 	error.x = ref.x - cur_total.x;
@@ -186,6 +172,7 @@ void svm(){
 		}
 	}
 
+	RTC->ALRMAR=index_best;//write to dummy register of now to prevent optimising out
 	//pass best to deadtime gen
 
 	//load 32 bit literal(same used to initialize?)
@@ -195,6 +182,12 @@ void svm(){
 	//(condition carry flag) or 8bit with 8lsl 8bit
 	//or 8bit and 32 bit
 	//write 32 bit to registers
+
+
+	/*
+	 * ldr r0, =0b01000000010000000100000001000000
+	 * mov r1, #0b10000
+	 */
 }
 
 float interpolate_mtpa_table(float speed, float current){

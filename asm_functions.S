@@ -23,11 +23,13 @@
 .balign 4
 .thumb_func
 	fsine:
+	nop
 
 .section .text.fsine_cosine,"ax",%progbits
 .balign 4
 .thumb_func
 	fsine_cosine:
+	nop
 
 .section .text.finvtan2,"ax",%progbits
 .balign 4
@@ -39,4 +41,4 @@
 .balign 4
 .thumb_func
 	fsqrt:
-	nop
+	vsqrt.f32 s0, s0
