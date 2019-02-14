@@ -16,12 +16,14 @@
 //prolly dont need any context saving in the fpu
 //s16 and need to be preserved use those for variables
 //the compile now pushes d8-d10 can my fpu handle this, have i selected the right one
+//(turn on debugging info again later)
 
 #define radius_hysteresis_circle 1
 #define n_samples_averaging 1
 #define sin120 0.8660254037844
 #define cos120 -0.5
 #define default_can_adress something
+//register float i_a __asm__("s16");
 
 typedef struct {
 	float x;
@@ -76,7 +78,7 @@ float i_a;
 float i_b;
 float i_c;
 vector rotor;
-float volatile requested_torque;
+float volatile requested_torque;//which valua do i save in registers?
 
 //prototypes
 void wait(void);
@@ -104,8 +106,9 @@ void main(){
 }
 
 void process_data(){
-	//filters?
+	//filters and averaging?
 	//decode values
+	//scale hall?
 	//adjust for non linearity?
 	//adjust for delay?
 
@@ -116,8 +119,8 @@ void field_controll(){
 }
 
 void svm(){
-	// normalize hall?
 	//calculate the third coil current
+
 	i_c = (float)(-i_a - i_b);
 
 	//place currents in space
