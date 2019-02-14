@@ -7,4 +7,4 @@ extern void svm_asm(void);
 extern float fsine(float i);
 extern struct twofloats fsine_cosine(float i);
 extern float finvtan2(float i0, float i1);
-extern inline float fsqrt(float i);
+extern float fsqrt(float i);

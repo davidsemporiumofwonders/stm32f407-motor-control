@@ -122,7 +122,7 @@ void field_controll(){
 void svm(){
 	// normalize hall?
 	//calculate the third coil current
-	float i_c = (float)(-i_a - i_b);
+	i_c = (float)(-i_a - i_b);
 
 	//place currents in space
 	vector cur_a;
@@ -172,21 +172,26 @@ void svm(){
 		}
 	}
 
-	RTC->ALRMAR=index_best;//write to dummy register of now to prevent optimising out
 	//pass best to deadtime gen
-
-	//load 32 bit literal(same used to initialize?)
-	//load 8 bit imm with on bit set
-	//shift betsindex right, update flags
-	//shift 8bit imm 8*bestindex left
-	//(condition carry flag) or 8bit with 8lsl 8bit
-	//or 8bit and 32 bit
-	//write 32 bit to registers
+	//init override bits?
+	uint16_t table[]={0b0100000001010000, 0b0101000001010000, 0b0101000001000000, 0b0101000001000000, 0b0100000001000000, 0b0100000001010000};
+	TIM1->CCMR1=table[index_best];
 
 
-	/*
-	 * ldr r0, =0b01000000010000000100000001000000
-	 * mov r1, #0b10000
+	/* add best, best , iets
+	 * ldr r0, =0x40010018
+	 * ldr r1, [pc, index_best]
+	 * strh r1, [r0], #4
+	 * lsl r1, r1, #16
+	 * strh r1, [r0]
+	 * bx//?
+	 * .4byte 0b01000000010000000100000001010000
+	 * .4byte 0b01000000010000000101000001010000
+	 * .4byte 0b01000000010000000101000001000000
+	 * .4byte 0b01000000010100000101000001000000
+	 * .4byte 0b01000000010100000100000001000000
+	 * .4byte 0b01000000010100000100000001010000
+	 * .pool
 	 */
 }
 
