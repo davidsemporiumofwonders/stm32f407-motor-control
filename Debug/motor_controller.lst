@@ -22,11 +22,11 @@ Idx Name          Size      VMA       LMA       File off  Algn  Flags
   3 .stack        00000400  2000001c  08000360  0002001c  2**0  ALLOC
   4 .ARM.attributes 00000035  00000000  00000000  00010360  2**0  CONTENTS, READONLY
   5 .comment      0000002b  00000000  00000000  00010395  2**0  CONTENTS, READONLY
-  6 .debug_line   000000dc  00000000  00000000  000103c0  2**0  CONTENTS, READONLY, DEBUGGING
-  7 .debug_info   000000da  00000000  00000000  0001049c  2**0  CONTENTS, READONLY, DEBUGGING
-  8 .debug_abbrev 00000024  00000000  00000000  00010576  2**0  CONTENTS, READONLY, DEBUGGING
-  9 .debug_aranges 00000068  00000000  00000000  000105a0  2**3  CONTENTS, READONLY, DEBUGGING
- 10 .debug_ranges 00000058  00000000  00000000  00010608  2**3  CONTENTS, READONLY, DEBUGGING
+  6 .debug_line   0000005e  00000000  00000000  000103c0  2**0  CONTENTS, READONLY, DEBUGGING
+  7 .debug_info   0000006a  00000000  00000000  0001041e  2**0  CONTENTS, READONLY, DEBUGGING
+  8 .debug_abbrev 00000012  00000000  00000000  00010488  2**0  CONTENTS, READONLY, DEBUGGING
+  9 .debug_aranges 00000028  00000000  00000000  000104a0  2**3  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_ranges 00000020  00000000  00000000  000104c8  2**3  CONTENTS, READONLY, DEBUGGING
 SYMBOL TABLE:
 08000000 l    d  .text	00000000 .text
 20000000 l    d  .data	00000000 .data
@@ -193,37 +193,16 @@ Disassembly of section .text:
 
 08000188 <fsine_cosine>:
 fsine_cosine():
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:32
-
-.section .text.fsine_cosine,"ax",%progbits
-.balign 4
-.thumb_func
-	fsine_cosine:
-	nop
  8000188:	bf00      	nop
  800018a:	bf00      	nop
 
 0800018c <finvtan2>:
 finvtan2():
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:38
-
-.section .text.finvtan2,"ax",%progbits
-.balign 4
-.thumb_func
-	finvtan2:
-	nop
  800018c:	bf00      	nop
  800018e:	bf00      	nop
 
 08000190 <fsqrt>:
 fsqrt():
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:44
-
-.section .text.fsqrt,"ax",%progbits
-.balign 4
-.thumb_func
-	fsqrt:
-	vsqrt.f32 s0, s0
  8000190:	eeb1 0ac0 	vsqrt.f32	s0, s0
 
 08000194 <main>:

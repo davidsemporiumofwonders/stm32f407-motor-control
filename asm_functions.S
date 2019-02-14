@@ -17,6 +17,7 @@
 .balign 4
 .thumb_func
 	svm_asm:
+
 	nop
 
 .section .text.fsine,"ax",%progbits

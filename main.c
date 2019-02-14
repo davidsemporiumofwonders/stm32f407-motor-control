@@ -7,19 +7,15 @@
 //reverse?
 //can
 //(synchronous?)automated adc or software initalized?
-//dummy loops for back emf sensing?
+//back emf sensing?
 //sensorless?, automatic fault detection and switching to sensorless
 //alu and fpu in parralel?
-//own math fuctions?
-//profiling arm code?
 //register variables?
 //check out automatic stacking behavior of fpu
-//unaligned access
-//why am i using so much ram withput code
-//are we armv7e-m , checkout sel instruction
-//float accuracy
+//checkout sel instruction
 //prolly dont need any context saving in the fpu
-//funtion inlining
+//s16 and need to be preserved use those for variables
+//the compile now pushes d8-d10 can my fpu handle this, have i selected the right one
 
 #define radius_hysteresis_circle 1
 #define n_samples_averaging 1

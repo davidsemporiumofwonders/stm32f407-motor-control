@@ -205,10 +205,10 @@ LOAD ./startup.o
  .v4_bx         0x0000000008000360        0x0 linker stubs
 
 .iplt           0x0000000008000360        0x0
- .iplt          0x0000000008000360        0x0 ./asm_functions.o
+ .iplt          0x0000000008000360        0x0 ./main.o
 
 .rel.dyn        0x0000000008000360        0x0
- .rel.iplt      0x0000000008000360        0x0 ./asm_functions.o
+ .rel.iplt      0x0000000008000360        0x0 ./main.o
 
 .data           0x0000000020000000        0x0 load address 0x0000000008000360
  FILL mask 0xff
@@ -220,7 +220,7 @@ LOAD ./startup.o
                 0x0000000020000000                _edata = .
 
 .igot.plt       0x0000000020000000        0x0 load address 0x0000000008000360
- .igot.plt      0x0000000020000000        0x0 ./asm_functions.o
+ .igot.plt      0x0000000020000000        0x0 ./main.o
 
 .bss            0x0000000020000000       0x1c load address 0x0000000008000360
                 0x0000000020000000                . = ALIGN (0x4)
@@ -264,24 +264,18 @@ OUTPUT(motor_controller.elf elf32-littlearm)
  .comment       0x0000000000000000       0x2b ./main.o
                                          0x2c (size before relaxing)
 
-.debug_line     0x0000000000000000       0xdc
- .debug_line    0x0000000000000000       0x7e ./asm_functions.o
- .debug_line    0x000000000000007e       0x5e ./startup.o
+.debug_line     0x0000000000000000       0x5e
+ .debug_line    0x0000000000000000       0x5e ./startup.o
 
-.debug_info     0x0000000000000000       0xda
- .debug_info    0x0000000000000000       0x70 ./asm_functions.o
- .debug_info    0x0000000000000070       0x6a ./startup.o
+.debug_info     0x0000000000000000       0x6a
+ .debug_info    0x0000000000000000       0x6a ./startup.o
 
-.debug_abbrev   0x0000000000000000       0x24
- .debug_abbrev  0x0000000000000000       0x12 ./asm_functions.o
- .debug_abbrev  0x0000000000000012       0x12 ./startup.o
+.debug_abbrev   0x0000000000000000       0x12
+ .debug_abbrev  0x0000000000000000       0x12 ./startup.o
 
-.debug_aranges  0x0000000000000000       0x68
+.debug_aranges  0x0000000000000000       0x28
  .debug_aranges
-                0x0000000000000000       0x40 ./asm_functions.o
- .debug_aranges
-                0x0000000000000040       0x28 ./startup.o
+                0x0000000000000000       0x28 ./startup.o
 
-.debug_ranges   0x0000000000000000       0x58
- .debug_ranges  0x0000000000000000       0x38 ./asm_functions.o
- .debug_ranges  0x0000000000000038       0x20 ./startup.o
+.debug_ranges   0x0000000000000000       0x20
+ .debug_ranges  0x0000000000000000       0x20 ./startup.o
