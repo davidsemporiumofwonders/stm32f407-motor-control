@@ -31,7 +31,7 @@
 	fsine_cosine://no linear interpolation for now
 	    vcvt.u32.f32 s0,s0,#10//change to reflect number of entries in table
         vmov r0,s0
-        lsls.n r1,r0,#// the appropiate number of bits
+        lsls.n r1,r0,#23// the appropiate number of bits
 		mov r1,r0//do that branch/copy differently?
         ite mi
         submi r0, #2^10

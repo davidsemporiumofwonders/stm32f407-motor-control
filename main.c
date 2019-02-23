@@ -152,8 +152,8 @@ void svm_correct_current_towards(vector_mag_ang ref_current){
 
 	struct twofloats sine_cosine = fsine_cosine(ref_current.ang);
 	vector ref;
-	ref.x = sine_cosine.value1*ref_current.mag;//cosine and sine correctly paired?
-	ref.y = sine_cosine.value0*ref_current.mag;
+	ref.x = sine_cosine.value1 * ref_current.mag;//cosine and sine correctly paired?
+	ref.y = sine_cosine.value0 * ref_current.mag;
 
 	//get error
 	vector error;
