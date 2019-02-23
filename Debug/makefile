@@ -43,7 +43,7 @@ all: motor_controller.elf secondary-outputs
 motor_controller.elf: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GNU ARM Cross C Linker'
-	arm-none-eabi-gcc -mcpu=cortex-m4 -march=armv7e-m -mthumb -mlittle-endian -mfloat-abi=hard -mfpu=fpv4-sp-d16 -munaligned-access -O3 -fmessage-length=0 -ffunction-sections -fdata-sections -fno-common -ffreestanding -fno-builtin -fsingle-precision-constant -Wunused -Wuninitialized -Wall -Wextra -Wmissing-declarations -Wconversion -Wpointer-arith -Wpadded -Wshadow -Wlogical-op -Wfloat-equal -T "/home/david/Documents/workspace-arm/motor_controller/linker.ld" -nostdlib -Xlinker --gc-sections -Wl,-Map,"motor_controller.map" --specs=nano.specs -o "motor_controller.elf" $(OBJS) $(USER_OBJS) $(LIBS)
+	arm-none-eabi-gcc -mcpu=cortex-m4 -march=armv7e-m -mthumb -mlittle-endian -mfloat-abi=hard -mfpu=fpv4-sp-d16 -munaligned-access -O3 -fmessage-length=0 -ffunction-sections -fdata-sections -fno-common -ffreestanding -fno-builtin -fsingle-precision-constant -Wunused -Wuninitialized -Wall -Wextra -Wmissing-declarations -Wconversion -Wpointer-arith -Wpadded -Wshadow -Wlogical-op -Waggregate-return -Wfloat-equal  -g3 -ggdb -T "/home/david/Documents/workspace-arm/motor_controller/linker.ld" -nostdlib -Xlinker --gc-sections -Wl,-Map,"motor_controller.map" --specs=nano.specs -o "motor_controller.elf" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

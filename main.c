@@ -18,7 +18,7 @@
 //the compile now pushes d8-d10 can my fpu handle this, have i selected the right one
 //(turn on debugging info again later)
 
-#define radius_hysteresis_circle 1
+#define min_mag_commutation 1
 #define n_samples_averaging 1
 #define sin120 0.8660254037844
 #define cos120 -0.5
@@ -47,8 +47,6 @@ typedef struct {
 
 volatile adc_conversions adc_circ_buffer[sizeof(adc_conversions)*n_samples_averaging] __attribute__ ((aligned (2)));//align on 4 bytes?
 
-//cosine table
-
 const float mtpa_lut[][1];//datatype?, search algorithm?
 
 const uint8_t rotary_resolver_correction_lut[];//const gets placed in text! can be changed in linker
@@ -66,25 +64,26 @@ float ov_lockout;
 float uv_lockout;
 float ov_lockout_release;
 float uv_lockout_release;//floats?
-uint8_t n_polepairs;//pairs!, 8 bits?, constant?, technically this number should be npp/npp_sensemagnet
+uint8_t n_polepairs_per_poles_sense_magnet;//pairs!
 float torque_per_amp;
 
 uint8_t faultcodes[8];//flash eeprom emulation
 uint8_t faultcodes_index;
 
-float hall_x_scaling;
-float hall_y_scaling;
 float i_a;
 float i_b;
 float i_c;
-vector rotor;
-float volatile requested_torque;//which valua do i save in registers?
+float prev_rotor_ang;
+float rotor_ang;
+float speed;
+float volatile requested_current;//which values do i save in registers?
 
 //prototypes
 void wait(void);
 void process_data(void);
-void svm(void);
-void field_controll(void);
+vector_mag_ang calculate_desired_current(void);
+void svm_correct_current_towards(vector_mag_ang);
+void stator_field_controll(void);
 float interpolate_mtpa_table(float speed, float current);
 extern void TIM2_IRQHandler(void);
 
@@ -108,17 +107,28 @@ void main(){
 void process_data(){
 	//filters and averaging?
 	//decode values
-	//scale hall?
-	//adjust for non linearity?
+
+	rotor_ang = finvtan2(adc_circ_buffer[0].v_rotor_x, adc_circ_buffer[0].v_rotor_y);
+	//corrections rotor vector
+	//calculate speed
+	//convert mechanical degrees to electrical degrees
 	//adjust for delay?
 
 }
 
-void field_controll(){
+void stator_field_controll(){
 
 }
 
-void svm(){
+vector_mag_ang calculate_desired_current(){
+	vector_mag_ang out;
+	out.ang = rotor_ang + interpolate_mtpa_table(1,1);
+	out.mag = requested_current * torque_per_amp;
+
+	return out;
+}
+
+void svm_correct_current_towards(vector_mag_ang ref_current){
 	//calculate the third coil current
 
 	i_c = (float)(-i_a - i_b);
@@ -140,29 +150,21 @@ void svm(){
 	cur_total.x = cur_a.x + cur_b.x + cur_c.x;
 	cur_total.y = cur_a.y + cur_b.y + cur_c.y;
 
-	vector_mag_ang rotor_mag_ang;
-	rotor_mag_ang.mag=fsqrt(rotor.x*rotor.x + rotor.y*rotor.y);
-	rotor_mag_ang.ang=finvtan2(rotor.x,rotor.y);
-
-	//corrections rotor vector
-	//calculate speed?
-	//convert mechanical degrees to electrical degrees(move these up to data processing?)
-
-	//setup ref vector in xy
-	float temp = rotor_mag_ang.mag * requested_torque * torque_per_amp;
+	struct twofloats sine_cosine = fsine_cosine(ref_current.ang);
 	vector ref;
-	struct twofloats sine_cosine = fsine_cosine(rotor_mag_ang.ang + mtpa_lut[0][0]);//get rid of the cos(the entire perspective switch really(how conducive are the corrections to this?)) by having the rotation lut return cos a and sin a
-	ref.x = sine_cosine.value1*temp;//cosine and sine correctly paired?
-	ref.y = sine_cosine.value0*temp;//scaling correct?
+	ref.x = sine_cosine.value1*ref_current.mag;//cosine and sine correctly paired?
+	ref.y = sine_cosine.value0*ref_current.mag;
+
 	//get error
 	vector error;
 	error.x = ref.x - cur_total.x;
 	error.y = ref.y - cur_total.y;
+
 	//ignore if error is too small?
 
+	//get best action
 	uint8_t index_best = 0;
 	float best = 0;
-	//get best action
 	for(uint8_t i = 0; i < sizeof(switch_state_vectors); i++){
 		float temp = switch_state_vectors[i].x*error.x + switch_state_vectors[i].y*error.y < best;
 		if(temp > best){
@@ -202,8 +204,7 @@ void wait(){
 
 }
 
-
 void TIM2_IRQHandler(){
 	process_data();
-	svm();
+	svm_correct_current_towards(calculate_desired_current());
 }
