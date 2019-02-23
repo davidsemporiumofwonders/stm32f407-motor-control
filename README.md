@@ -1,5 +1,4 @@
 svm foc motor controll on stm32f407 based around the method described on: http://build-its-inprogress.blogspot.nl/2017/05/vector-hysteresis-foc.html
-my math is not really trustworthy enough to be doing this: evaluate it yourself alswell
 
 //conventions:
 
