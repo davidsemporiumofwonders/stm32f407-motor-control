@@ -17,11 +17,14 @@
 //the compile now pushes d8-d10 can my fpu handle this, have i selected the right one
 //(turn on debugging info again later)
 //core coupled memory?
+//see if you can do better than 40khz
 
 #define min_mag_commutation 1
 #define n_samples_averaging 1
-#define sin120 0.8660254037844
-#define cos120 -0.5
+#define sin60 0.8660254
+#define sin120 sin60
+#define cos60 0.5
+#define cos120 -cos60
 #define default_can_adress something
 #define prop_delay 0
 //register float i_a __asm__("s16");
@@ -52,12 +55,12 @@ const float mtpa_lut[][1];//datatype?, search algorithm?
 
 const uint8_t rotary_resolver_correction_lut[];//const gets placed in text! can be changed in linker
 
-const vector switch_state_vectors[] = { {0,0},
-		{0,0},
-		{0,0},
-		{0,0},
-		{0,0},
-		{0,0} };//index 0 is coil a high, rest off, increasing the index sees the resultant magnetic field progress clockwise
+const vector switch_state_vectors[] = { {0,1},
+										{sin60, cos60},
+										{sin120, cos120},
+										{0,-1},
+										{-sin60, -cos60},
+										{-sin120,-cos120} };//index 0 is coil a high, rest off, increasing the index sees the resultant magnetic field progress clockwise
 
 float max_speed;
 float max_current;
