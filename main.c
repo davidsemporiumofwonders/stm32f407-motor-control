@@ -5,7 +5,6 @@
 //auto find phase ordering, polartity
 //absolute vs relative position?
 //reverse?
-//can
 //(synchronous?)automated adc or software initalized?
 //back emf sensing?
 //sensorless?, automatic fault detection and switching to sensorless
@@ -17,12 +16,14 @@
 //s16 and need to be preserved use those for variables
 //the compile now pushes d8-d10 can my fpu handle this, have i selected the right one
 //(turn on debugging info again later)
+//core coupled memory?
 
 #define min_mag_commutation 1
 #define n_samples_averaging 1
 #define sin120 0.8660254037844
 #define cos120 -0.5
 #define default_can_adress something
+#define prop_delay 0
 //register float i_a __asm__("s16");
 
 typedef struct {
@@ -52,11 +53,11 @@ const float mtpa_lut[][1];//datatype?, search algorithm?
 const uint8_t rotary_resolver_correction_lut[];//const gets placed in text! can be changed in linker
 
 const vector switch_state_vectors[] = { {0,0},
-										{0,0},
-										{0,0},
-										{0,0},
-										{0,0},
-										{0,0} };//index 0 is coil a high, rest off, increasing the index sees the resultant magnetic field progress clockwise
+		{0,0},
+		{0,0},
+		{0,0},
+		{0,0},
+		{0,0} };//index 0 is coil a high, rest off, increasing the index sees the resultant magnetic field progress clockwise
 
 float max_speed;
 float max_current;
@@ -73,8 +74,8 @@ uint8_t faultcodes_index;
 float i_a;
 float i_b;
 float i_c;
-float prev_rotor_ang;
-float rotor_ang;
+float prev_rotor_e_pos;
+float rotor_e_pos;
 float speed;
 float volatile requested_current;//which values do i save in registers?
 
@@ -84,21 +85,30 @@ void process_data(void);
 vector_mag_ang calculate_desired_current(void);
 void svm_correct_current_towards(vector_mag_ang);
 void stator_field_controll(void);
-float interpolate_mtpa_table(float speed, float current);
+float query_encoder_table(float pos);
+float query_mtpa_table(float speed, float current);
 extern void TIM2_IRQHandler(void);
 
 void main(){
 	//configure clocks
+	RCC->AHB1ENR = 1<<22;//enable dma2, gpio clocks
+	RCC->APB1ENR = 0;//enable timx
+	RCC->APB2ENR = 1<<8 | 1;//enable adc1, usart, tim1 clocks
+	//setup debug?
+	//setup eeprom emulation?
 	//turn on/off peripherals
 	//setup gpio
+	GPIOA->MODER = 0;
+	//setup fpu, load freq used constants
 	//setup tim1 for deadtime
 	//setup 40khz loop
+	//setup interrupts, priorities
+	NVIC->ISER[1]=1;
 	//setup adc
-	//setup fpu, load freq used constants
-	//setup can
-	//setup dmas
-	//setup encoder
+	//setup dma
+	//setup ethernet
 	//negtiote parameters with main controller
+	//setup encoder
 	while(1){
 
 	}
@@ -108,12 +118,11 @@ void process_data(){
 	//filters and averaging?
 	//decode values
 
-	rotor_ang = finvtan2(adc_circ_buffer[0].v_rotor_x, adc_circ_buffer[0].v_rotor_y);
-	//corrections rotor vector
-	//calculate speed
-	//convert mechanical degrees to electrical degrees
-	//adjust for delay?
-
+	rotor_e_pos = finvtan2(adc_circ_buffer[0].v_rotor_x, adc_circ_buffer[0].v_rotor_y) * n_polepairs_per_poles_sense_magnet;//wraparound?
+	rotor_e_pos = query_encoder_table(rotor_e_pos);
+	speed = rotor_e_pos - prev_rotor_e_pos;//wraparound?
+	prev_rotor_e_pos = rotor_e_pos;
+	rotor_e_pos = rotor_e_pos + speed * prop_delay;
 }
 
 void stator_field_controll(){
@@ -122,7 +131,7 @@ void stator_field_controll(){
 
 vector_mag_ang calculate_desired_current(){
 	vector_mag_ang out;
-	out.ang = rotor_ang + interpolate_mtpa_table(1,1);
+	out.ang = rotor_e_pos + query_mtpa_table(1,1);
 	out.mag = requested_current * torque_per_amp;
 
 	return out;
@@ -165,11 +174,11 @@ void svm_correct_current_towards(vector_mag_ang ref_current){
 	//get best action
 	uint8_t index_best = 0;
 	float best = 0;
-	for(uint8_t i = 0; i < sizeof(switch_state_vectors); i++){
-		float temp = switch_state_vectors[i].x*error.x + switch_state_vectors[i].y*error.y < best;
+	for(uint8_t i = 0; i < sizeof(switch_state_vectors)/sizeof(vector); i++){
+		float temp = switch_state_vectors[i].x * error.x + switch_state_vectors[i].y * error.y;
 		if(temp > best){
-			best=temp;
-			index_best=i;
+			best = temp;
+			index_best = i;
 		}
 	}
 
@@ -177,7 +186,6 @@ void svm_correct_current_towards(vector_mag_ang ref_current){
 	//init override bits?
 	uint16_t table[]={0b0100000001010000, 0b0101000001010000, 0b0101000001000000, 0b0101000001000000, 0b0100000001000000, 0b0100000001010000};
 	TIM1->CCMR1=table[index_best];
-
 
 	/* add best, best , iets
 	 * ldr r0, =0x40010018
@@ -196,8 +204,12 @@ void svm_correct_current_towards(vector_mag_ang ref_current){
 	 */
 }
 
-float interpolate_mtpa_table(float speed, float current){
+float query_mtpa_table(float speed, float current){
 	return 0;
+}
+
+float query_encoder_table(float pos){
+	return pos;
 }
 
 void wait(){

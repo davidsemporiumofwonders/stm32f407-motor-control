@@ -418,10 +418,14 @@ Vectors:
 	cmp r3, r2
 	bne loop2
 
+	//setup clocks
+	//setup flitf
 
 	b main
 	.balign 4//unaligned loads and stores take an extra cycle
 	.pool
+
+//add handlers for system exeptions?
 
 .section .text.default_handler,"ax",%progbits
 .balign 4

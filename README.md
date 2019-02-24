@@ -6,4 +6,5 @@ svm foc motor controll on stm32f407 based around the method described on: http:/
 //coil a is at 0 degrees other coils are named clock wise and placed in 120 degree increments
 //positive current on a coil means flowing out of the controller(from the phase connections, obviously not ground wiseguy) and the resultant magnetic field pointing outward from rotor axle
 //si units, angles in full revolutions
+//speed in revolutions per switching time (1/40khz)
 //[0,0] is on rotor axle, x axis is horizontal(9 to 3 o'clock), y vertical, both axises(is that a word?) are fixed to the stator, incrementing to right and upwards repectively
