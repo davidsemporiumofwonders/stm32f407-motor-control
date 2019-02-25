@@ -18,6 +18,8 @@
 //(turn on debugging info again later)
 //core coupled memory?
 //see if you can do better than 40khz
+//interleaved adc conversions?
+//different clock domains?
 
 #define min_mag_commutation 1
 #define n_samples_averaging 1
@@ -48,6 +50,7 @@ typedef struct {
 	uint16_t v_rotor_x;
 	uint16_t v_rotor_y;
 }adc_conversions;
+//do bus measurements at software request?
 
 volatile adc_conversions adc_circ_buffer[sizeof(adc_conversions)*n_samples_averaging] __attribute__ ((aligned (2)));//align on 4 bytes?
 
@@ -125,7 +128,7 @@ void process_data(){
 	rotor_e_pos = query_encoder_table(rotor_e_pos);
 	speed = rotor_e_pos - prev_rotor_e_pos;//wraparound?
 	prev_rotor_e_pos = rotor_e_pos;
-	rotor_e_pos = rotor_e_pos + speed * prop_delay;
+	rotor_e_pos = rotor_e_pos + speed * prop_delay;//this can be incoporated in the mpta lut(?)
 }
 
 void stator_field_controll(){
@@ -141,6 +144,7 @@ vector_mag_ang calculate_desired_current(){
 }
 
 void svm_correct_current_towards(vector_mag_ang ref_current){
+	//how to keep the dma from intefering, ccm ram, registers?
 	//calculate the third coil current
 
 	i_c = (float)(-i_a - i_b);
