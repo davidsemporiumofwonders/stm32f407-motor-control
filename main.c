@@ -7,19 +7,20 @@
 //reverse?
 //(synchronous?)automated adc or software initalized?
 //back emf sensing?
-//sensorless?, automatic fault detection and switching to sensorless
+//sensorless?, automatic fault detection and switching to sensorless, what type sensors?
 //alu and fpu in parralel?
 //register variables?
 //check out automatic stacking behavior of fpu
 //checkout sel instruction
 //prolly dont need any context saving in the fpu
 //s16 and need to be preserved use those for variables
-//the compile now pushes d8-d10 can my fpu handle this, have i selected the right one
+//the compiler now pushes d8-d10 can my fpu handle this, have i selected the right one
 //(turn on debugging info again later)
 //core coupled memory?
 //see if you can do better than 40khz
-//interleaved adc conversions?
+//interleaved adc conversions, or parralel?
 //different clock domains?
+//backemf sensing on higset priority timer interrupt -> wait for peak ?
 
 #define min_mag_commutation 1
 #define n_samples_averaging 1
@@ -29,7 +30,8 @@
 #define cos120 -cos60
 #define default_can_adress something
 #define prop_delay 0
-//register float i_a __asm__("s16");
+#define current_per_count 1
+#define current_count_midpoint 2048
 
 typedef struct {
 	float x;
@@ -50,7 +52,6 @@ typedef struct {
 	uint16_t v_rotor_x;
 	uint16_t v_rotor_y;
 }adc_conversions;
-//do bus measurements at software request?
 
 volatile adc_conversions adc_circ_buffer[sizeof(adc_conversions)*n_samples_averaging] __attribute__ ((aligned (2)));//align on 4 bytes?
 
@@ -64,6 +65,8 @@ const vector switch_state_vectors[] = { {0,1},
 										{0,-1},
 										{-sin60, -cos60},
 										{-sin120,-cos120} };//index 0 is coil a high, rest off, increasing the index sees the resultant magnetic field progress clockwise
+
+//register float i_a __asm__("s16");
 
 float max_speed;
 float max_current;
@@ -86,8 +89,9 @@ float speed;
 float volatile requested_current;//which values do i save in registers?
 
 //prototypes
-void wait(void);
+void wait(uint32_t ticks);
 void process_data(void);
+void calibrate_encoder(void);
 vector_mag_ang calculate_desired_current(void);
 void svm_correct_current_towards(vector_mag_ang);
 void stator_field_controll(void);
@@ -105,14 +109,17 @@ void main(){
 	//turn on/off peripherals
 	//setup gpio
 	GPIOA->MODER = 0;
-	//setup fpu, load freq used constants
+	//setup fpu, load freq used constants ?
 	//setup tim1 for deadtime
+
 	//setup 40khz loop
+	//setup stator field timer
 	//setup interrupts, priorities
 	NVIC->ISER[1]=1;
 	//setup adc
 	//setup dma
 	//setup ethernet
+	//setup usart?
 	//negtiote parameters with main controller
 	//setup encoder
 	while(1){
@@ -123,8 +130,10 @@ void main(){
 void process_data(){
 	//filters and averaging?
 	//decode values
-
+	i_a = (((float)adc_circ_buffer[0].i_a) - current_count_midpoint) * current_per_count;
+	i_b = (((float)adc_circ_buffer[0].i_b) - current_count_midpoint) * current_per_count;
 	rotor_e_pos = finvtan2(adc_circ_buffer[0].v_rotor_x, adc_circ_buffer[0].v_rotor_y) * n_polepairs_per_poles_sense_magnet;//wraparound?
+	//adjusts
 	rotor_e_pos = query_encoder_table(rotor_e_pos);
 	speed = rotor_e_pos - prev_rotor_e_pos;//wraparound?
 	prev_rotor_e_pos = rotor_e_pos;
@@ -132,6 +141,7 @@ void process_data(){
 }
 
 void stator_field_controll(){
+	//100 herz?
 
 }
 
@@ -144,10 +154,9 @@ vector_mag_ang calculate_desired_current(){
 }
 
 void svm_correct_current_towards(vector_mag_ang ref_current){
-	//how to keep the dma from intefering, ccm ram, registers?
 	//calculate the third coil current
 
-	i_c = (float)(-i_a - i_b);
+	i_c = -i_a - i_b;
 
 	//place currents in space
 	vector cur_a;
@@ -155,11 +164,11 @@ void svm_correct_current_towards(vector_mag_ang ref_current){
 	vector cur_c;
 
 	cur_a.x = 0;
-	cur_a.y = (float)(i_a);
-	cur_b.x = (float)(i_b)*cos120;
-	cur_b.y = cur_b.x*-sin120/cos120;
-	cur_c.x = i_c*cos120;
-	cur_c.y = i_c*sin120;
+	cur_a.y = i_a;
+	cur_b.x = i_b * cos120;
+	cur_b.y = i_b * -sin120;
+	cur_c.x = i_c * cos120;
+	cur_c.y = i_c * sin120;
 
 	//total current vector
 	vector cur_total;
@@ -168,8 +177,8 @@ void svm_correct_current_towards(vector_mag_ang ref_current){
 
 	struct twofloats sine_cosine = fsine_cosine(ref_current.ang);
 	vector ref;
-	ref.x = sine_cosine.value1 * ref_current.mag;//cosine and sine correctly paired?
-	ref.y = sine_cosine.value0 * ref_current.mag;
+	ref.x = sine_cosine.value0 * ref_current.mag;
+	ref.y = sine_cosine.value1 * ref_current.mag;
 
 	//get error
 	vector error;
@@ -193,6 +202,7 @@ void svm_correct_current_towards(vector_mag_ang ref_current){
 	//init override bits?
 	uint16_t table[]={0b0100000001010000, 0b0101000001010000, 0b0101000001000000, 0b0101000001000000, 0b0100000001000000, 0b0100000001010000};
 	TIM1->CCMR1=table[index_best];
+	//other register
 
 	/* add best, best , iets
 	 * ldr r0, =0x40010018
@@ -211,6 +221,18 @@ void svm_correct_current_towards(vector_mag_ang ref_current){
 	 */
 }
 
+void calibrate_encoder(){
+	//offload (parts) to pc?
+	vector_mag_ang follow_field;
+	follow_field.mag = 20;
+	while(follow_field.ang < 0.8){
+		follow_field.ang += 0.005;
+		svm_correct_current_towards(follow_field);// or commutate on timer?
+		wait(10);//values!?
+		//record data
+	}
+}
+
 float query_mtpa_table(float speed, float current){
 	return 0;
 }
@@ -219,11 +241,12 @@ float query_encoder_table(float pos){
 	return pos;
 }
 
-void wait(){
+void wait(uint32_t ticks){
 
 }
 
 void TIM2_IRQHandler(){
+	//turn off dma
 	process_data();
 	svm_correct_current_towards(calculate_desired_current());
 }

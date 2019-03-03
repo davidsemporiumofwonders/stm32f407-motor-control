@@ -29,15 +29,17 @@
 .balign 4
 .thumb_func
 	fsine_cosine://no linear interpolation for now
-	    vcvt.u32.f32 s0,s0,#10//change to reflect number of entries in table
+	    vcvt.u32.f32 s0,s0,#32
         vmov r0,s0
-        lsls.n r1,r0,#23// the appropiate number of bits
+        lsls.n r1,r0,#1
 		mov r1,r0//do that branch/copy differently?
         ite mi
-        submi r0, #2^10
-        subpl r1, #2^10//check pairing register, condition
-        //mask registers
-        //load base address into r2
+        submi r0, #2^32
+        subpl r1, #2^32//check pairing register, condition
+		//right shift
+        .equ    label, cosine_table
+		movw    r2, #:lower16:label//when the table is placed at the top of ram this instruction does nothing
+		movt    r2, #:upper16:label
         ldr r3, [r2, r0]
         vmov r3, s0
         ldr r3, [r2, r1]
