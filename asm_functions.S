@@ -18,6 +18,21 @@
 .thumb_func
 	svm_asm:
 	nop
+	/* add best, best , iets
+	 * ldr r0, =0x40010018
+	 * ldr r1, [pc, index_best]
+	 * strh r1, [r0], #4
+	 * lsl r1, r1, #16
+	 * strh r1, [r0]
+	 * bx//?
+	 * .4byte 0b01000000010000000100000001010000
+	 * .4byte 0b01000000010000000101000001010000
+	 * .4byte 0b01000000010000000101000001000000
+	 * .4byte 0b01000000010100000101000001000000
+	 * .4byte 0b01000000010100000100000001000000
+	 * .4byte 0b01000000010100000100000001010000
+	 * .pool
+	 */
 
 .section .text.fsine,"ax",%progbits
 .balign 4

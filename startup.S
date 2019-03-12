@@ -17,7 +17,7 @@
 
 Vectors:
 	.4byte  _estack
-	.4byte  reset_handler
+	.4byte  main
 	.4byte  NMI_Handler
   	.4byte  HardFault_Handler
   	.4byte  MemManage_Handler
@@ -397,35 +397,7 @@ Vectors:
    .weak      FPU_IRQHandler
    .thumb_set FPU_IRQHandler,default_handler
 
-.section .text.reset_handler,"ax",%progbits
-.balign 4//just align everything on 4 byte boudenry, flash is plentyfull
-.thumb_func
-	reset_handler:
-
-	ldr r0, =_sidata
-	ldr r1, =_sdata
-	ldr r2, =_edata
-	ldr r3, =_ebss//load multiple?
-
-	loop:
-	ldr r4, [r0], 4
-	str r4, [r1], 4
-	subs r5, r2, r0
-	bne loop
-
-	loop2:
-	str r5, [r2], 4
-	cmp r3, r2
-	bne loop2
-
-	//setup clocks
-	//setup flitf
-
-	b main
-	.balign 4//unaligned loads and stores take an extra cycle
-	.pool
-
-//add handlers for system exeptions?
+//add handlers for system exeptions(?)
 
 .section .text.default_handler,"ax",%progbits
 .balign 4

@@ -1,27 +1,32 @@
 #include "stm32f4xx.h"
 #include "asm_functions.h"
 
-//field strength based on calulated speed
+//todos, questions
+
+//field strength based on calulated speed?
 //auto find phase ordering, polartity
-//absolute vs relative position?
 //reverse?
-//(synchronous?)automated adc or software initalized?
 //back emf sensing?
 //sensorless?, automatic fault detection and switching to sensorless, what type sensors?
 //alu and fpu in parralel?
 //register variables?
-//check out automatic stacking behavior of fpu
-//checkout sel instruction
 //prolly dont need any context saving in the fpu
-//s16 and need to be preserved use those for variables
+//s16 and up need to be preserved use those for variables
 //the compiler now pushes d8-d10 can my fpu handle this, have i selected the right one
-//(turn on debugging info again later)
-//core coupled memory?
+//core coupled memory, different ram banks?
 //see if you can do better than 40khz
 //interleaved adc conversions, or parralel?
+//injected channels for bus measurement?
+//anawd to generated interrupt on bus values?
 //different clock domains?
-//backemf sensing on higset priority timer interrupt -> wait for peak ?
+//backemf sensing on higset priority timer interrupt -> wait for peak and set timer accordingly?
+//data/instruction caching in both core and st implementation?
+//ideally you would request torque from the controller
+//ethernet or can?
+//cleanup ifdefs, only if the roots let the compiler remove uncalled code/variables
+//stacksize?
 
+//defines
 #define min_mag_commutation 1
 #define n_samples_averaging 1
 #define sin60 0.8660254
@@ -32,7 +37,9 @@
 #define prop_delay 0
 #define current_per_count 1
 #define current_count_midpoint 2048
+//#define cheat_at_mtpa //make the gross assumption that load is constant and therefore max speed corresponds to max torque
 
+//typedefs
 typedef struct {
 	float x;
 	float y;
@@ -53,11 +60,18 @@ typedef struct {
 	uint16_t v_rotor_y;
 }adc_conversions;
 
-volatile adc_conversions adc_circ_buffer[sizeof(adc_conversions)*n_samples_averaging] __attribute__ ((aligned (2)));//align on 4 bytes?
+extern uint32_t _sidata;
+extern uint32_t _sdata;
+extern uint32_t _edata;
+extern uint32_t _sbss;
+extern uint32_t _ebss;
 
-const float mtpa_lut[][1];//datatype?, search algorithm?
+//constants, const gets placed in text! can be changed in linker(relation to literals?)
+#ifndef cheat_at_mtpa
+const float mtpa_lut[][1];//datatype?
+#endif
 
-const uint8_t rotary_resolver_correction_lut[];//const gets placed in text! can be changed in linker
+const uint8_t rotary_resolver_correction_lut[];
 
 const vector switch_state_vectors[] = { {0,1},
 										{sin60, cos60},
@@ -66,8 +80,7 @@ const vector switch_state_vectors[] = { {0,1},
 										{-sin60, -cos60},
 										{-sin120,-cos120} };//index 0 is coil a high, rest off, increasing the index sees the resultant magnetic field progress clockwise
 
-//register float i_a __asm__("s16");
-
+//variables set at init
 float max_speed;
 float max_current;
 float ov_lockout;
@@ -80,48 +93,107 @@ float torque_per_amp;
 uint8_t faultcodes[8];//flash eeprom emulation
 uint8_t faultcodes_index;
 
+//dynamic variables
+//register float i_a __asm__("s16");//which values do i save in registers?
 float i_a;
 float i_b;
 float i_c;
 float prev_rotor_e_pos;
 float rotor_e_pos;
 float speed;
-float volatile requested_current;//which values do i save in registers?
+float current_angle_advance;
+float prev_speed_per_amp;
+
+volatile float requested_current;
+volatile adc_conversions adc_circ_buffer[sizeof(adc_conversions)*n_samples_averaging] __attribute__ ((aligned (2)));//align on 4 bytes?
 
 //prototypes
+void init_system(void);
+void main(void);
 void wait(uint32_t ticks);
-void process_data(void);
 void calibrate_encoder(void);
+float query_encoder_table(float pos);
+float query_mtpa_table(float speed, float current);
+void process_data(void);
 vector_mag_ang calculate_desired_current(void);
 void svm_correct_current_towards(vector_mag_ang);
 void stator_field_controll(void);
-float query_encoder_table(float pos);
-float query_mtpa_table(float speed, float current);
-extern void TIM2_IRQHandler(void);
+void track_max_speed_per_amp(void);
 
-void main(){
-	//configure clocks
-	RCC->AHB1ENR = 1<<22;//enable dma2, gpio clocks
+extern void TIM2_IRQHandler(void);
+extern void TIM3_IRQHandler(void);
+#ifdef cheat_at_mtpa
+extern void TIM4_IRQHandler(void);
+#endif
+
+void init_system(){
+	//setup system clocks
+	//no reset to initial state for now
+	//enable HSE
+	RCC->CR = RCC_CR_HSEON;// |= ?
+	//wait till HSE is ready
+	while ((RCC->CR & RCC_CR_HSERDY) == 0){}
+	//configure art accelerator?
+	//configure the Flash Latency cycles and enable prefetch buffer
+	//FLASH->ACR;
+	//configure the System clock frequency, HCLK, PCLK2 and PCLK1 prescalers
+	//RCC->CFGR;
+	//configure and enable PLL
+	//RCC->CR;
+	//wait till PLL is ready
+	while ((RCC->CR & RCC_CR_PLLRDY) == 0){}
+	//select PLL as system clock source
+	RCC->CFGR |= RCC_CFGR_SW_PLL;
+	//wait till PLL is used as system clock source
+	//while ((RCC->CFGR & RCC_CFGR_SWS) != something){}
+
+	//init ram
+	uint32_t *src, *dst;
+	//copy the data segment into ram
+	src = &_sidata;
+	dst = &_sdata;
+	if (src != dst){
+		while(dst < &_edata){
+			*(dst++) = *(src++);
+		}
+	}
+	//zero the bss segment
+	dst = &_sbss;
+	while(dst < &_ebss){
+		*(dst++) = 0;
+	}
+
+	//configure peripheral clocks
+	RCC->AHB1ENR = 1<<22;//enable dma2, gpio clocks,no |=?
 	RCC->APB1ENR = 0;//enable timx
 	RCC->APB2ENR = 1<<8 | 1;//enable adc1, usart, tim1 clocks
+
 	//setup debug?
 	//setup eeprom emulation?
 	//turn on/off peripherals
 	//setup gpio
-	GPIOA->MODER = 0;
+	//GPIOA->MODER;
+	//RCC->CR;
 	//setup fpu, load freq used constants ?
 	//setup tim1 for deadtime
-
-	//setup 40khz loop
-	//setup stator field timer
+	//setup 40khz loop on tim2
+	//setup stator field timer on tim3?
+#ifdef cheat_at_mpta
+	//setup best advance tracking
+#endif
 	//setup interrupts, priorities
-	NVIC->ISER[1]=1;
+	//NVIC->ISER;
 	//setup adc
 	//setup dma
 	//setup ethernet
 	//setup usart?
 	//negtiote parameters with main controller
 	//setup encoder
+
+	main();
+}
+
+void main(){
 	while(1){
 
 	}
@@ -141,6 +213,13 @@ void process_data(){
 }
 
 void stator_field_controll(){
+	//no contex saving on fpu? -> do manually here
+	//100 herz?
+
+}
+
+void track_max_speed_per_amp(){
+	//no contex saving on fpu? -> do manually here
 	//100 herz?
 
 }
@@ -203,22 +282,6 @@ void svm_correct_current_towards(vector_mag_ang ref_current){
 	uint16_t table[]={0b0100000001010000, 0b0101000001010000, 0b0101000001000000, 0b0101000001000000, 0b0100000001000000, 0b0100000001010000};
 	TIM1->CCMR1=table[index_best];
 	//other register
-
-	/* add best, best , iets
-	 * ldr r0, =0x40010018
-	 * ldr r1, [pc, index_best]
-	 * strh r1, [r0], #4
-	 * lsl r1, r1, #16
-	 * strh r1, [r0]
-	 * bx//?
-	 * .4byte 0b01000000010000000100000001010000
-	 * .4byte 0b01000000010000000101000001010000
-	 * .4byte 0b01000000010000000101000001000000
-	 * .4byte 0b01000000010100000101000001000000
-	 * .4byte 0b01000000010100000100000001000000
-	 * .4byte 0b01000000010100000100000001010000
-	 * .pool
-	 */
 }
 
 void calibrate_encoder(){
@@ -250,3 +313,16 @@ void TIM2_IRQHandler(){
 	process_data();
 	svm_correct_current_towards(calculate_desired_current());
 }
+
+void TIM3_IRQHandler(){
+	//dma?
+	stator_field_controll();
+}
+
+#ifdef cheat_at_mtpa
+void TIM4_IRQHandler(){
+	//interrupt priority?
+	//dma?
+	track_max_speed_per_amp();
+}
+#endif
