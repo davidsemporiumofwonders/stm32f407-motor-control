@@ -25,6 +25,7 @@
 //ethernet or can?
 //cleanup ifdefs, only if the roots let the compiler remove uncalled code/variables
 //stacksize?
+//init order still allow optimizations?
 
 //defines
 #define min_mag_commutation 1
@@ -130,22 +131,23 @@ void init_system(){
 	//setup system clocks
 	//no reset to initial state for now
 	//enable HSE
-	RCC->CR = RCC_CR_HSEON;// |= ?
+	RCC->CR = RCC_CR_HSEON;
 	//wait till HSE is ready
 	while ((RCC->CR & RCC_CR_HSERDY) == 0){}
 	//configure art accelerator?
 	//configure the Flash Latency cycles and enable prefetch buffer
 	//FLASH->ACR;
-	//configure the System clock frequency, HCLK, PCLK2 and PCLK1 prescalers
+	//configure the HCLK, ahb, apb prescalers
 	//RCC->CFGR;
 	//configure and enable PLL
-	//RCC->CR;
+	RCC->PLLCFGR = (7<<RCC_PLLCFGR_PLLQ) & (1<<RCC_PLLCFGR_PLLSRC) & (168<<RCC_PLLCFGR_PLLN) & 4;
+	RCC->CR = RCC_CR_PLLON;
 	//wait till PLL is ready
 	while ((RCC->CR & RCC_CR_PLLRDY) == 0){}
 	//select PLL as system clock source
 	RCC->CFGR |= RCC_CFGR_SW_PLL;
 	//wait till PLL is used as system clock source
-	//while ((RCC->CFGR & RCC_CFGR_SWS) != something){}
+	while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL){}
 
 	//init ram
 	uint32_t *src, *dst;
@@ -163,32 +165,32 @@ void init_system(){
 		*(dst++) = 0;
 	}
 
+	//setup debug?
+	//setup fpu, load freq used constants ?
+	//setup eeprom emulation?
 	//configure peripheral clocks
 	RCC->AHB1ENR = 1<<22;//enable dma2, gpio clocks,no |=?
 	RCC->APB1ENR = 0;//enable timx
 	RCC->APB2ENR = 1<<8 | 1;//enable adc1, usart, tim1 clocks
 
-	//setup debug?
-	//setup eeprom emulation?
 	//turn on/off peripherals
 	//setup gpio
 	//GPIOA->MODER;
 	//RCC->CR;
-	//setup fpu, load freq used constants ?
-	//setup tim1 for deadtime
-	//setup 40khz loop on tim2
-	//setup stator field timer on tim3?
-#ifdef cheat_at_mpta
-	//setup best advance tracking
-#endif
-	//setup interrupts, priorities
-	//NVIC->ISER;
 	//setup adc
 	//setup dma
 	//setup ethernet
 	//setup usart?
 	//negtiote parameters with main controller
-	//setup encoder
+	//setup encoder?
+	//setup tim1 for deadtime
+	//setup 40khz loop on tim2
+	//setup stator field timer on tim3?
+	#ifdef cheat_at_mpta
+		//setup best advance tracking
+	#endif
+	//setup interrupts, priorities
+	//NVIC->ISER;
 
 	main();
 }
@@ -281,7 +283,7 @@ void svm_correct_current_towards(vector_mag_ang ref_current){
 	//init override bits?
 	uint16_t table[]={0b0100000001010000, 0b0101000001010000, 0b0101000001000000, 0b0101000001000000, 0b0100000001000000, 0b0100000001010000};
 	TIM1->CCMR1=table[index_best];
-	//other register
+	//other register!
 }
 
 void calibrate_encoder(){
