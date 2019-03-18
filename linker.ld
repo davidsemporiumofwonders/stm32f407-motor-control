@@ -1,7 +1,8 @@
 MEMORY
 {
-   FLASH (rx) : ORIGIN = 0x08000000, LENGTH = 512k
-   RAM  (rwx) : ORIGIN = 0x20000000, LENGTH = 192k
+   FLASH  (rx) : ORIGIN = 0x08000000, LENGTH = 512k
+   RAM   (rwx) : ORIGIN = 0x20000000, LENGTH = 192k
+   CCMRAM (rw) : ORIGIN = 0x10000000, LENGTH = 64k
 }
 
 STACK_SIZE = 1024;
@@ -15,10 +16,11 @@ SECTIONS
     {
         /* All unused bytes set to 0xFF. */
         FILL (0xff)
- 
+        _svtflash = .;   
         /* ISR Vector Table first */
         KEEP(*(.vector_table))
- 
+ 		_evtflash = .; 
+ 		 
         . = ALIGN(4);
         *(.text)        /* Program code */
         *(.text.*)
@@ -68,4 +70,16 @@ SECTIONS
     {
         . = . + STACK_SIZE;
     } > RAM
+    
+    .ccmram :
+	{
+
+    . = ALIGN(4);
+    _sccmram = .;       /* create a global symbol at ccmram start */
+    *(.ccmram)
+    *(.ccmram*)
+    . = ALIGN(4);
+    _eccmram = .;       /* create a global symbol at ccmram end */
+
+ 	} >CCMRAM AT> FLASH
 }

@@ -7,35 +7,37 @@ start address 0x08000000
 
 Program Header:
     LOAD off    0x00010000 vaddr 0x08000000 paddr 0x08000000 align 2**16
-         filesz 0x000003f4 memsz 0x000003f4 flags r-x
-    LOAD off    0x00020000 vaddr 0x20000000 paddr 0x080003f4 align 2**16
+         filesz 0x00000410 memsz 0x00000410 flags r-x
+    LOAD off    0x00020000 vaddr 0x20000000 paddr 0x08000410 align 2**16
          filesz 0x00001000 memsz 0x000010e8 flags rw-
-    LOAD off    0x000210e8 vaddr 0x200010e8 paddr 0x080013f4 align 2**16
+    LOAD off    0x000210e8 vaddr 0x200010e8 paddr 0x08001410 align 2**16
          filesz 0x00000000 memsz 0x00000400 flags rw-
 private flags = 5000400: [Version5 EABI] [hard-float ABI]
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn  Flags
-  0 .text         000003f4  08000000  08000000  00010000  2**2  CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .data         00001000  20000000  080003f4  00020000  2**2  CONTENTS, ALLOC, LOAD, DATA
-  2 .bss          000000e8  20001000  080013f4  00021000  2**2  ALLOC
-  3 .stack        00000400  200010e8  080013f4  000210e8  2**0  ALLOC
-  4 .ARM.attributes 00000035  00000000  00000000  00021000  2**0  CONTENTS, READONLY
-  5 .comment      0000002b  00000000  00000000  00021035  2**0  CONTENTS, READONLY
-  6 .debug_line   0000049a  00000000  00000000  00021060  2**0  CONTENTS, READONLY, DEBUGGING
-  7 .debug_info   00000cb1  00000000  00000000  000214fa  2**0  CONTENTS, READONLY, DEBUGGING
-  8 .debug_abbrev 0000033c  00000000  00000000  000221ab  2**0  CONTENTS, READONLY, DEBUGGING
-  9 .debug_aranges 000000d0  00000000  00000000  000224e8  2**3  CONTENTS, READONLY, DEBUGGING
- 10 .debug_ranges 00000158  00000000  00000000  000225b8  2**3  CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    00000283  00000000  00000000  00022710  2**0  CONTENTS, READONLY, DEBUGGING
- 12 .debug_macro  0000ad9f  00000000  00000000  00022993  2**0  CONTENTS, READONLY, DEBUGGING
- 13 .debug_str    0003b85f  00000000  00000000  0002d732  2**0  CONTENTS, READONLY, DEBUGGING
- 14 .debug_frame  00000190  00000000  00000000  00068f94  2**2  CONTENTS, READONLY, DEBUGGING
+  0 .text         00000410  08000000  08000000  00010000  2**2  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00001000  20000000  08000410  00020000  2**2  CONTENTS, ALLOC, LOAD, DATA
+  2 .bss          000000e8  20001000  08001410  00021000  2**2  ALLOC
+  3 .stack        00000400  200010e8  08001410  000210e8  2**0  ALLOC
+  4 .ccmram       00000000  10000000  10000000  00021000  2**0  CONTENTS
+  5 .ARM.attributes 00000035  00000000  00000000  00021000  2**0  CONTENTS, READONLY
+  6 .comment      0000002b  00000000  00000000  00021035  2**0  CONTENTS, READONLY
+  7 .debug_line   000004cc  00000000  00000000  00021060  2**0  CONTENTS, READONLY, DEBUGGING
+  8 .debug_info   0000102c  00000000  00000000  0002152c  2**0  CONTENTS, READONLY, DEBUGGING
+  9 .debug_abbrev 000002dc  00000000  00000000  00022558  2**0  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_aranges 000000d0  00000000  00000000  00022838  2**3  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_ranges 00000168  00000000  00000000  00022908  2**3  CONTENTS, READONLY, DEBUGGING
+ 12 .debug_loc    000002c8  00000000  00000000  00022a70  2**0  CONTENTS, READONLY, DEBUGGING
+ 13 .debug_macro  0000adab  00000000  00000000  00022d38  2**0  CONTENTS, READONLY, DEBUGGING
+ 14 .debug_str    0003b994  00000000  00000000  0002dae3  2**0  CONTENTS, READONLY, DEBUGGING
+ 15 .debug_frame  000001a0  00000000  00000000  00069478  2**2  CONTENTS, READONLY, DEBUGGING
 SYMBOL TABLE:
 08000000 l    d  .text	00000000 .text
 20000000 l    d  .data	00000000 .data
 20001000 l    d  .bss	00000000 .bss
 200010e8 l    d  .stack	00000000 .stack
+10000000 l    d  .ccmram	00000000 .ccmram
 00000000 l    d  .ARM.attributes	00000000 .ARM.attributes
 00000000 l    d  .comment	00000000 .comment
 00000000 l    d  .debug_line	00000000 .debug_line
@@ -50,158 +52,163 @@ SYMBOL TABLE:
 00000000 l    df *ABS*	00000000 ./startup.o
 00000000 l    df *ABS*	00000000 ./asm_functions.o
 00000000 l    df *ABS*	00000000 main.c
-080003e4  w    F .text	00000000 RTC_Alarm_IRQHandler
-080003e4  w    F .text	00000000 HASH_RNG_IRQHandler
-080003e4  w    F .text	00000000 EXTI2_IRQHandler
-080003e4  w    F .text	00000000 TIM8_CC_IRQHandler
-080003e4  w    F .text	00000000 DebugMon_Handler
+080003f4  w    F .text	00000000 RTC_Alarm_IRQHandler
+080003f4  w    F .text	00000000 HASH_RNG_IRQHandler
+080003f4  w    F .text	00000000 EXTI2_IRQHandler
+080003f4  w    F .text	00000000 TIM8_CC_IRQHandler
+080003f4  w    F .text	00000000 DebugMon_Handler
 20000000 g     O .data	00001000 cosine_table
 00000400 g       *ABS*	00000000 STACK_SIZE
-080003e4  w    F .text	00000000 TIM1_CC_IRQHandler
-080003e4  w    F .text	00000000 DMA2_Stream5_IRQHandler
-080003e4  w    F .text	00000000 HardFault_Handler
-080003e4  w    F .text	00000000 DMA1_Stream5_IRQHandler
-080003e4  w    F .text	00000000 SysTick_Handler
-080003e4  w    F .text	00000000 PVD_IRQHandler
-080003e4  w    F .text	00000000 SDIO_IRQHandler
-080003e4  w    F .text	00000000 TAMP_STAMP_IRQHandler
-080003f4 g       .text	00000000 _sidata
-080003e4  w    F .text	00000000 PendSV_Handler
-080003e4  w    F .text	00000000 NMI_Handler
-080003e4  w    F .text	00000000 CAN2_RX1_IRQHandler
-080003e4  w    F .text	00000000 EXTI3_IRQHandler
+080003f4  w    F .text	00000000 TIM1_CC_IRQHandler
+080003f4  w    F .text	00000000 DMA2_Stream5_IRQHandler
+080003f4  w    F .text	00000000 HardFault_Handler
+080003f4  w    F .text	00000000 DMA1_Stream5_IRQHandler
+080003f4  w    F .text	00000000 SysTick_Handler
+080003f4  w    F .text	00000000 PVD_IRQHandler
+080003f4  w    F .text	00000000 SDIO_IRQHandler
+080003f4  w    F .text	00000000 TAMP_STAMP_IRQHandler
+08000410 g       .text	00000000 _sidata
+080003f4  w    F .text	00000000 PendSV_Handler
+080003f4  w    F .text	00000000 NMI_Handler
+080003f4  w    F .text	00000000 CAN2_RX1_IRQHandler
+080003f4  w    F .text	00000000 EXTI3_IRQHandler
 20001004 g     O .bss	000000c4 adc_circ_buffer
-080003e4  w    F .text	00000000 TIM8_TRG_COM_TIM14_IRQHandler
+080003f4  w    F .text	00000000 TIM8_TRG_COM_TIM14_IRQHandler
 200010d0 g     O .bss	00000004 rotor_e_pos
-080003e4  w    F .text	00000000 TIM1_UP_TIM10_IRQHandler
-080003f4 g       .text	00000000 _etext
+080003f4  w    F .text	00000000 TIM1_UP_TIM10_IRQHandler
+08000410 g       .text	00000000 _etext
 20001000 g       .bss	00000000 _sbss
-080003e4  w    F .text	00000000 TIM8_UP_TIM13_IRQHandler
-080003e4  w    F .text	00000000 I2C3_ER_IRQHandler
+080003f4  w    F .text	00000000 TIM8_UP_TIM13_IRQHandler
+080003f4  w    F .text	00000000 I2C3_ER_IRQHandler
 200010c8 g     O .bss	00000001 n_polepairs_per_poles_sense_magnet
-080003e4  w    F .text	00000000 EXTI0_IRQHandler
-080003e4  w    F .text	00000000 I2C2_EV_IRQHandler
-080003e4  w    F .text	00000000 DMA1_Stream2_IRQHandler
-080003e4  w    F .text	00000000 CAN1_RX0_IRQHandler
-080003e4  w    F .text	00000000 FPU_IRQHandler
-080003e4  w    F .text	00000000 OTG_HS_WKUP_IRQHandler
-080003e4  w    F .text	00000000 UsageFault_Handler
-080003e4  w    F .text	00000000 CAN2_SCE_IRQHandler
-080003e4  w    F .text	00000000 DMA2_Stream2_IRQHandler
+080003f4  w    F .text	00000000 EXTI0_IRQHandler
+080003f4  w    F .text	00000000 I2C2_EV_IRQHandler
+080003f4  w    F .text	00000000 DMA1_Stream2_IRQHandler
+080003f4  w    F .text	00000000 CAN1_RX0_IRQHandler
+080003f4  w    F .text	00000000 FPU_IRQHandler
+080003f4  w    F .text	00000000 OTG_HS_WKUP_IRQHandler
+080003f4  w    F .text	00000000 UsageFault_Handler
+080003f4  w    F .text	00000000 CAN2_SCE_IRQHandler
+080003f4  w    F .text	00000000 DMA2_Stream2_IRQHandler
 20000000 g       .data	00000000 _sdata
-080003e4  w    F .text	00000000 SPI1_IRQHandler
-080003e4  w    F .text	00000000 TIM6_DAC_IRQHandler
-080003e4  w    F .text	00000000 TIM1_BRK_TIM9_IRQHandler
-080003e4  w    F .text	00000000 DCMI_IRQHandler
-080003e4  w    F .text	00000000 CAN2_RX0_IRQHandler
-080003e4  w    F .text	00000000 DMA2_Stream3_IRQHandler
-080003e4 g     F .text	00000000 default_handler
-080003e4  w    F .text	00000000 USART6_IRQHandler
+080003f4  w    F .text	00000000 SPI1_IRQHandler
+080003f4  w    F .text	00000000 TIM6_DAC_IRQHandler
+080003f4  w    F .text	00000000 TIM1_BRK_TIM9_IRQHandler
+080003f4  w    F .text	00000000 DCMI_IRQHandler
+080003f4  w    F .text	00000000 CAN2_RX0_IRQHandler
+080003f4  w    F .text	00000000 DMA2_Stream3_IRQHandler
+080003f4 g     F .text	00000000 default_handler
+08000000 g       .text	00000000 _svtflash
+080003f4  w    F .text	00000000 USART6_IRQHandler
 200010dc g     O .bss	00000004 i_c
 080001c0 g     F .text	00000000 finvtan2
-080003e4  w    F .text	00000000 USART3_IRQHandler
-080003e4  w    F .text	00000000 CRYP_IRQHandler
+080003f4  w    F .text	00000000 USART3_IRQHandler
+080003f4  w    F .text	00000000 CRYP_IRQHandler
 200010e8 g       .bss	00000000 _ebss
 20001000 g     O .bss	00000004 torque_per_amp
-080003e4  w    F .text	00000000 CAN1_RX1_IRQHandler
-080003e4  w    F .text	00000000 UART5_IRQHandler
-080003e4  w    F .text	00000000 DMA2_Stream0_IRQHandler
+080003f4  w    F .text	00000000 CAN1_RX1_IRQHandler
+080003f4  w    F .text	00000000 UART5_IRQHandler
+080003f4  w    F .text	00000000 DMA2_Stream0_IRQHandler
 200010e0 g     O .bss	00000004 prev_rotor_e_pos
-080003e4  w    F .text	00000000 TIM4_IRQHandler
-080003e4  w    F .text	00000000 I2C1_EV_IRQHandler
-080003e4  w    F .text	00000000 DMA1_Stream6_IRQHandler
-080003e4  w    F .text	00000000 DMA1_Stream1_IRQHandler
-080003e4  w    F .text	00000000 UART4_IRQHandler
-080003e0 g     F .text	00000002 TIM3_IRQHandler
-080003e4  w    F .text	00000000 RCC_IRQHandler
-080003e4  w    F .text	00000000 TIM8_BRK_TIM12_IRQHandler
-080003e4  w    F .text	00000000 EXTI15_10_IRQHandler
+080003f4  w    F .text	00000000 TIM4_IRQHandler
+080003f4  w    F .text	00000000 I2C1_EV_IRQHandler
+080003f4  w    F .text	00000000 DMA1_Stream6_IRQHandler
+080003f4  w    F .text	00000000 DMA1_Stream1_IRQHandler
+080003f4  w    F .text	00000000 UART4_IRQHandler
+080003f0 g     F .text	00000002 TIM3_IRQHandler
+080003f4  w    F .text	00000000 RCC_IRQHandler
+080003f4  w    F .text	00000000 TIM8_BRK_TIM12_IRQHandler
+080003f4  w    F .text	00000000 EXTI15_10_IRQHandler
 08000000 g     O .text	00000000 Vectors
-080003e4  w    F .text	00000000 ADC_IRQHandler
-080003e4  w    F .text	00000000 DMA1_Stream7_IRQHandler
+080003f4  w    F .text	00000000 ADC_IRQHandler
+080003f4  w    F .text	00000000 DMA1_Stream7_IRQHandler
 08000188 g     F .text	00000000 fsine_cosine
-080003e4  w    F .text	00000000 TIM7_IRQHandler
-080003e4  w    F .text	00000000 CAN2_TX_IRQHandler
-080003e4  w    F .text	00000000 TIM5_IRQHandler
-080003e4  w    F .text	00000000 DMA2_Stream7_IRQHandler
-080003e4  w    F .text	00000000 I2C3_EV_IRQHandler
-080003e4  w    F .text	00000000 EXTI9_5_IRQHandler
-080003e4  w    F .text	00000000 RTC_WKUP_IRQHandler
-080003e4  w    F .text	00000000 ETH_WKUP_IRQHandler
-080003e4  w    F .text	00000000 SPI2_IRQHandler
-080003e4  w    F .text	00000000 OTG_HS_EP1_IN_IRQHandler
-080003e4  w    F .text	00000000 MemManage_Handler
+080003f4  w    F .text	00000000 TIM7_IRQHandler
+080003f4  w    F .text	00000000 CAN2_TX_IRQHandler
+080003f4  w    F .text	00000000 TIM5_IRQHandler
+080003f4  w    F .text	00000000 DMA2_Stream7_IRQHandler
+080003f4  w    F .text	00000000 I2C3_EV_IRQHandler
+080003f4  w    F .text	00000000 EXTI9_5_IRQHandler
+080003f4  w    F .text	00000000 RTC_WKUP_IRQHandler
+080003f4  w    F .text	00000000 ETH_WKUP_IRQHandler
+080003f4  w    F .text	00000000 SPI2_IRQHandler
+080003f4  w    F .text	00000000 OTG_HS_EP1_IN_IRQHandler
+080003f4  w    F .text	00000000 MemManage_Handler
 200010d4 g     O .bss	00000004 i_a
 080001c4 g     F .text	00000002 main
-080003e4  w    F .text	00000000 DMA1_Stream0_IRQHandler
-080003e4  w    F .text	00000000 CAN1_TX_IRQHandler
-080003e4  w    F .text	00000000 SVC_Handler
-080003e4  w    F .text	00000000 EXTI4_IRQHandler
+080003f4  w    F .text	00000000 DMA1_Stream0_IRQHandler
+080003f4  w    F .text	00000000 CAN1_TX_IRQHandler
+080003f4  w    F .text	00000000 SVC_Handler
+080003f4  w    F .text	00000000 EXTI4_IRQHandler
 2002fc00 g       *ABS*	00000000 _sstack
-080003e4  w    F .text	00000000 FSMC_IRQHandler
-080003e4  w    F .text	00000000 ETH_IRQHandler
-080003e4  w    F .text	00000000 OTG_HS_EP1_OUT_IRQHandler
-080003e4  w    F .text	00000000 WWDG_IRQHandler
+10000000 g       .ccmram	00000000 _eccmram
+080003f4  w    F .text	00000000 FSMC_IRQHandler
+080003f4  w    F .text	00000000 ETH_IRQHandler
+080003f4  w    F .text	00000000 OTG_HS_EP1_OUT_IRQHandler
+080003f4  w    F .text	00000000 WWDG_IRQHandler
 200010e4 g     O .bss	00000004 speed
-08000314 g     F .text	000000cc TIM2_IRQHandler
-080003e4  w    F .text	00000000 OTG_FS_WKUP_IRQHandler
-080003e4  w    F .text	00000000 TIM1_TRG_COM_TIM11_IRQHandler
-080003e4  w    F .text	00000000 OTG_HS_IRQHandler
+08000328 g     F .text	000000c8 TIM2_IRQHandler
+080003f4  w    F .text	00000000 OTG_FS_WKUP_IRQHandler
+080003f4  w    F .text	00000000 TIM1_TRG_COM_TIM11_IRQHandler
+080003f4  w    F .text	00000000 OTG_HS_IRQHandler
 200010cc g     O .bss	00000004 requested_current
+08000188 g       .text	00000000 _evtflash
 20030000 g       .text	00000000 _estack
-080003e4  w    F .text	00000000 EXTI1_IRQHandler
+080003f4  w    F .text	00000000 EXTI1_IRQHandler
 20001000 g       .data	00000000 _edata
-080003e4  w    F .text	00000000 USART2_IRQHandler
-080001c8 g     F .text	0000014c svm_correct_current_towards
-080003e4  w    F .text	00000000 I2C2_ER_IRQHandler
-080003e4  w    F .text	00000000 DMA2_Stream1_IRQHandler
-080003e4  w    F .text	00000000 CAN1_SCE_IRQHandler
-080003e4  w    F .text	00000000 FLASH_IRQHandler
-080003e4  w    F .text	00000000 DMA2_Stream4_IRQHandler
-080003e4  w    F .text	00000000 BusFault_Handler
-080003e4  w    F .text	00000000 USART1_IRQHandler
-080003e4  w    F .text	00000000 OTG_FS_IRQHandler
-080003e4  w    F .text	00000000 SPI3_IRQHandler
-080003e4  w    F .text	00000000 DMA1_Stream4_IRQHandler
+10000000 g       .ccmram	00000000 _sccmram
+080003f4  w    F .text	00000000 USART2_IRQHandler
+080001c8 g     F .text	00000160 svm_correct_current_towards
+080003f4  w    F .text	00000000 I2C2_ER_IRQHandler
+080003f4  w    F .text	00000000 DMA2_Stream1_IRQHandler
+080003f4  w    F .text	00000000 CAN1_SCE_IRQHandler
+080003f4  w    F .text	00000000 FLASH_IRQHandler
+080003f4  w    F .text	00000000 DMA2_Stream4_IRQHandler
+080003f4  w    F .text	00000000 BusFault_Handler
+080003f4  w    F .text	00000000 USART1_IRQHandler
+080003f4  w    F .text	00000000 OTG_FS_IRQHandler
+080003f4  w    F .text	00000000 SPI3_IRQHandler
+080003f4  w    F .text	00000000 DMA1_Stream4_IRQHandler
 200010d8 g     O .bss	00000004 i_b
-080003e4  w    F .text	00000000 I2C1_ER_IRQHandler
-080003e4  w    F .text	00000000 DMA2_Stream6_IRQHandler
-080003e4  w    F .text	00000000 DMA1_Stream3_IRQHandler
+080003f4  w    F .text	00000000 I2C1_ER_IRQHandler
+080003f4  w    F .text	00000000 DMA2_Stream6_IRQHandler
+080003f4  w    F .text	00000000 DMA1_Stream3_IRQHandler
 
 
 
 Disassembly of section .text:
 
 08000000 <Vectors>:
- 8000000:	00 00 03 20 c5 01 00 08 e5 03 00 08 e5 03 00 08     ... ............
- 8000010:	e5 03 00 08 e5 03 00 08 e5 03 00 08 00 00 00 00     ................
+_svtflash():
+ 8000000:	00 00 03 20 c5 01 00 08 f5 03 00 08 f5 03 00 08     ... ............
+ 8000010:	f5 03 00 08 f5 03 00 08 f5 03 00 08 00 00 00 00     ................
 	...
- 800002c:	e5 03 00 08 e5 03 00 08 00 00 00 00 e5 03 00 08     ................
- 800003c:	e5 03 00 08 e5 03 00 08 e5 03 00 08 e5 03 00 08     ................
- 800004c:	e5 03 00 08 e5 03 00 08 e5 03 00 08 e5 03 00 08     ................
- 800005c:	e5 03 00 08 e5 03 00 08 e5 03 00 08 e5 03 00 08     ................
- 800006c:	e5 03 00 08 e5 03 00 08 e5 03 00 08 e5 03 00 08     ................
- 800007c:	e5 03 00 08 e5 03 00 08 e5 03 00 08 e5 03 00 08     ................
- 800008c:	e5 03 00 08 e5 03 00 08 e5 03 00 08 e5 03 00 08     ................
- 800009c:	e5 03 00 08 e5 03 00 08 e5 03 00 08 e5 03 00 08     ................
- 80000ac:	e5 03 00 08 15 03 00 08 e1 03 00 08 e5 03 00 08     ................
- 80000bc:	e5 03 00 08 e5 03 00 08 e5 03 00 08 e5 03 00 08     ................
- 80000cc:	e5 03 00 08 e5 03 00 08 e5 03 00 08 e5 03 00 08     ................
- 80000dc:	e5 03 00 08 e5 03 00 08 e5 03 00 08 e5 03 00 08     ................
- 80000ec:	e5 03 00 08 e5 03 00 08 e5 03 00 08 e5 03 00 08     ................
- 80000fc:	e5 03 00 08 e5 03 00 08 e5 03 00 08 e5 03 00 08     ................
- 800010c:	e5 03 00 08 e5 03 00 08 e5 03 00 08 e5 03 00 08     ................
- 800011c:	e5 03 00 08 e5 03 00 08 e5 03 00 08 e5 03 00 08     ................
- 800012c:	e5 03 00 08 e5 03 00 08 e5 03 00 08 e5 03 00 08     ................
- 800013c:	e5 03 00 08 e5 03 00 08 e5 03 00 08 e5 03 00 08     ................
- 800014c:	e5 03 00 08 e5 03 00 08 e5 03 00 08 e5 03 00 08     ................
- 800015c:	e5 03 00 08 e5 03 00 08 e5 03 00 08 e5 03 00 08     ................
- 800016c:	e5 03 00 08 e5 03 00 08 e5 03 00 08 e5 03 00 08     ................
- 800017c:	e5 03 00 08 e5 03 00 08 e5 03 00 08                 ............
+ 800002c:	f5 03 00 08 f5 03 00 08 00 00 00 00 f5 03 00 08     ................
+ 800003c:	f5 03 00 08 f5 03 00 08 f5 03 00 08 f5 03 00 08     ................
+ 800004c:	f5 03 00 08 f5 03 00 08 f5 03 00 08 f5 03 00 08     ................
+ 800005c:	f5 03 00 08 f5 03 00 08 f5 03 00 08 f5 03 00 08     ................
+ 800006c:	f5 03 00 08 f5 03 00 08 f5 03 00 08 f5 03 00 08     ................
+ 800007c:	f5 03 00 08 f5 03 00 08 f5 03 00 08 f5 03 00 08     ................
+ 800008c:	f5 03 00 08 f5 03 00 08 f5 03 00 08 f5 03 00 08     ................
+ 800009c:	f5 03 00 08 f5 03 00 08 f5 03 00 08 f5 03 00 08     ................
+ 80000ac:	f5 03 00 08 29 03 00 08 f1 03 00 08 f5 03 00 08     ....)...........
+ 80000bc:	f5 03 00 08 f5 03 00 08 f5 03 00 08 f5 03 00 08     ................
+ 80000cc:	f5 03 00 08 f5 03 00 08 f5 03 00 08 f5 03 00 08     ................
+ 80000dc:	f5 03 00 08 f5 03 00 08 f5 03 00 08 f5 03 00 08     ................
+ 80000ec:	f5 03 00 08 f5 03 00 08 f5 03 00 08 f5 03 00 08     ................
+ 80000fc:	f5 03 00 08 f5 03 00 08 f5 03 00 08 f5 03 00 08     ................
+ 800010c:	f5 03 00 08 f5 03 00 08 f5 03 00 08 f5 03 00 08     ................
+ 800011c:	f5 03 00 08 f5 03 00 08 f5 03 00 08 f5 03 00 08     ................
+ 800012c:	f5 03 00 08 f5 03 00 08 f5 03 00 08 f5 03 00 08     ................
+ 800013c:	f5 03 00 08 f5 03 00 08 f5 03 00 08 f5 03 00 08     ................
+ 800014c:	f5 03 00 08 f5 03 00 08 f5 03 00 08 f5 03 00 08     ................
+ 800015c:	f5 03 00 08 f5 03 00 08 f5 03 00 08 f5 03 00 08     ................
+ 800016c:	f5 03 00 08 f5 03 00 08 f5 03 00 08 f5 03 00 08     ................
+ 800017c:	f5 03 00 08 f5 03 00 08 f5 03 00 08                 ............
 
 08000188 <fsine_cosine>:
-fsine_cosine():
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:32
+_evtflash():
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:47
 
 .section .text.fsine_cosine,"ax",%progbits
 .balign 4
@@ -209,64 +216,64 @@ fsine_cosine():
 	fsine_cosine://no linear interpolation for now
 	    vcvt.u32.f32 s0,s0,#32
  8000188:	eebf 0ac0 	vcvt.u32.f32	s0, s0, #32
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:33
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:48
         vmov r0,s0
  800018c:	ee10 0a10 	vmov	r0, s0
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:34
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:49
         lsls.n r1,r0,#1
  8000190:	0041      	lsls	r1, r0, #1
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:35
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:50
 		mov r1,r0//do that branch/copy differently?
  8000192:	4601      	mov	r1, r0
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:36
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:51
         ite mi
  8000194:	bf4c      	ite	mi
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:37
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:52
         submi r0, #2^32
  8000196:	3822      	submi	r0, #34	; 0x22
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:38
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:53
         subpl r1, #2^32//check pairing register, condition
  8000198:	3922      	subpl	r1, #34	; 0x22
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:41
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:56
 		//right shift
         .equ    label, cosine_table
 		movw    r2, #:lower16:label//when the table is placed at the top of ram this instruction does nothing
  800019a:	f240 0200 	movw	r2, #0
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:42
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:57
 		movt    r2, #:upper16:label
  800019e:	f2c2 0200 	movt	r2, #8192	; 0x2000
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:43
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:58
         ldr r3, [r2, r0]
  80001a2:	5813      	ldr	r3, [r2, r0]
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:44
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:59
         vmov r3, s0
  80001a4:	ee10 3a10 	vmov	r3, s0
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:45
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:60
         ldr r3, [r2, r1]
  80001a8:	5853      	ldr	r3, [r2, r1]
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:46
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:61
         vmov r3, s1
  80001aa:	ee10 3a90 	vmov	r3, s1
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:47
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:62
         itt cs
  80001ae:	bf24      	itt	cs
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:48
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:63
         vnegcs.f32 s0,s0
  80001b0:	eeb1 0a40 	vnegcs.f32	s0, s0
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:49
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:64
         vnegcs.f32 s1,s1
  80001b4:	eef1 0a60 	vnegcs.f32	s1, s1
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:50
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:65
         it mi
  80001b8:	bf48      	it	mi
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:51
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:66
         vnegmi.f32 s1,s1
  80001ba:	eef1 0a60 	vnegmi.f32	s1, s1
  80001be:	bf00      	nop
 
 080001c0 <finvtan2>:
 finvtan2():
-/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:59
+/home/david/Documents/workspace-arm/motor_controller/Debug/../asm_functions.S:74
 
 .section .text.finvtan2,"ax",%progbits
 .balign 4
@@ -278,8 +285,8 @@ finvtan2():
 
 080001c4 <main>:
 main():
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:193
-	//setup encoder
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:253
+	//NVIC->ISER;
 
 	main();
 }
@@ -290,363 +297,373 @@ void main(){
 
 080001c8 <svm_correct_current_towards>:
 svm_correct_current_towards():
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:232
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:291
 	out.mag = requested_current * torque_per_amp;
 
 	return out;
 }
 
 void svm_correct_current_towards(vector_mag_ang ref_current){
- 80001c8:	b510      	push	{r4, lr}
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:235
+ 80001c8:	b530      	push	{r4, r5, lr}
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:294
 	//calculate the third coil current
 
 	i_c = -i_a - i_b;
- 80001ca:	4a4a      	ldr	r2, [pc, #296]	; (80002f4 <svm_correct_current_towards+0x12c>)
- 80001cc:	4b4a      	ldr	r3, [pc, #296]	; (80002f8 <svm_correct_current_towards+0x130>)
+ 80001ca:	4a4f      	ldr	r2, [pc, #316]	; (8000308 <svm_correct_current_towards+0x140>)
+ 80001cc:	4b4f      	ldr	r3, [pc, #316]	; (800030c <svm_correct_current_towards+0x144>)
  80001ce:	ed92 6a00 	vldr	s12, [r2]
  80001d2:	edd3 6a00 	vldr	s13, [r3]
- 80001d6:	4b49      	ldr	r3, [pc, #292]	; (80002fc <svm_correct_current_towards+0x134>)
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:280
-	}
+ 80001d6:	4b4e      	ldr	r3, [pc, #312]	; (8000310 <svm_correct_current_towards+0x148>)
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:340
 
 	//pass best to deadtime gen
 	//init override bits?
-	uint16_t table[]={0b0100000001010000, 0b0101000001010000, 0b0101000001000000, 0b0101000001000000, 0b0100000001000000, 0b0100000001010000};
-	TIM1->CCMR1=table[index_best];
- 80001d8:	4c49      	ldr	r4, [pc, #292]	; (8000300 <svm_correct_current_towards+0x138>)
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:232
+	uint16_t table0[]={0b0100000001010000, 0b0101000001010000, 0b0101000001000000, 0b0101000001000000, 0b0100000001000000, 0b0100000001010000};
+	uint16_t table1[]={0b0100000001000000, 0b0100000001000000, 0b0100000001000000, 0b0100000001010000, 0b0100000001010000, 0b0100000001010000};
+	TIM1->CCMR1=table0[index_best];
+ 80001d8:	4d4e      	ldr	r5, [pc, #312]	; (8000314 <svm_correct_current_towards+0x14c>)
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:291
 void svm_correct_current_towards(vector_mag_ang ref_current){
  80001da:	ed2d 8b08 	vpush	{d8-d11}
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:251
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:310
 	cur_total.x = cur_a.x + cur_b.x + cur_c.x;
- 80001de:	eddf 9a49 	vldr	s19, [pc, #292]	; 8000304 <svm_correct_current_towards+0x13c>
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:252
+ 80001de:	eddf 9a4e 	vldr	s19, [pc, #312]	; 8000318 <svm_correct_current_towards+0x150>
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:311
 	cur_total.y = cur_a.y + cur_b.y + cur_c.y;
- 80001e2:	ed9f aa49 	vldr	s20, [pc, #292]	; 8000308 <svm_correct_current_towards+0x140>
- 80001e6:	eddf aa49 	vldr	s21, [pc, #292]	; 800030c <svm_correct_current_towards+0x144>
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:251
+ 80001e2:	ed9f aa4e 	vldr	s20, [pc, #312]	; 800031c <svm_correct_current_towards+0x154>
+ 80001e6:	eddf aa4e 	vldr	s21, [pc, #312]	; 8000320 <svm_correct_current_towards+0x158>
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:310
 	cur_total.x = cur_a.x + cur_b.x + cur_c.x;
  80001ea:	eefe 8a00 	vmov.f32	s17, #224	; 0xbf000000 -0.5
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:252
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:311
 	cur_total.y = cur_a.y + cur_b.y + cur_c.y;
  80001ee:	eef0 7a46 	vmov.f32	s15, s12
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:251
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:310
 	cur_total.x = cur_a.x + cur_b.x + cur_c.x;
  80001f2:	eeb0 7a69 	vmov.f32	s14, s19
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:252
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:311
 	cur_total.y = cur_a.y + cur_b.y + cur_c.y;
  80001f6:	eee6 7a8a 	vfma.f32	s15, s13, s20
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:232
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:291
 void svm_correct_current_towards(vector_mag_ang ref_current){
- 80001fa:	b088      	sub	sp, #32
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:251
+ 80001fa:	b08b      	sub	sp, #44	; 0x2c
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:338
+	uint16_t table0[]={0b0100000001010000, 0b0101000001010000, 0b0101000001000000, 0b0101000001000000, 0b0100000001000000, 0b0100000001010000};
+ 80001fc:	ac04      	add	r4, sp, #16
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:310
 	cur_total.x = cur_a.x + cur_b.x + cur_c.x;
- 80001fc:	eea6 7aa8 	vfma.f32	s14, s13, s17
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:235
+ 80001fe:	eea6 7aa8 	vfma.f32	s14, s13, s17
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:294
 	i_c = -i_a - i_b;
- 8000200:	eeb1 6a46 	vneg.f32	s12, s12
- 8000204:	ee76 6a66 	vsub.f32	s13, s12, s13
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:232
+ 8000202:	eeb1 6a46 	vneg.f32	s12, s12
+ 8000206:	ee76 6a66 	vsub.f32	s13, s12, s13
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:291
 void svm_correct_current_towards(vector_mag_ang ref_current){
- 8000208:	eeb0 ba40 	vmov.f32	s22, s0
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:252
+ 800020a:	eeb0 ba40 	vmov.f32	s22, s0
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:311
 	cur_total.y = cur_a.y + cur_b.y + cur_c.y;
- 800020c:	eee6 7aaa 	vfma.f32	s15, s13, s21
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:251
+ 800020e:	eee6 7aaa 	vfma.f32	s15, s13, s21
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:310
 	cur_total.x = cur_a.x + cur_b.x + cur_c.x;
- 8000210:	eea6 7aa8 	vfma.f32	s14, s13, s17
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:232
+ 8000212:	eea6 7aa8 	vfma.f32	s14, s13, s17
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:291
 void svm_correct_current_towards(vector_mag_ang ref_current){
- 8000214:	ed8d 0a00 	vstr	s0, [sp]
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:254
+ 8000216:	ed8d 0a00 	vstr	s0, [sp]
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:313
 	struct twofloats sine_cosine = fsine_cosine(ref_current.ang);
- 8000218:	eeb0 0a60 	vmov.f32	s0, s1
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:252
+ 800021a:	eeb0 0a60 	vmov.f32	s0, s1
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:311
 	cur_total.y = cur_a.y + cur_b.y + cur_c.y;
- 800021c:	eeb0 8a67 	vmov.f32	s16, s15
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:251
+ 800021e:	eeb0 8a67 	vmov.f32	s16, s15
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:310
 	cur_total.x = cur_a.x + cur_b.x + cur_c.x;
- 8000220:	eeb0 9a47 	vmov.f32	s18, s14
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:235
+ 8000222:	eeb0 9a47 	vmov.f32	s18, s14
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:294
 	i_c = -i_a - i_b;
- 8000224:	edc3 6a00 	vstr	s13, [r3]
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:232
+ 8000226:	edc3 6a00 	vstr	s13, [r3]
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:291
 void svm_correct_current_towards(vector_mag_ang ref_current){
- 8000228:	edcd 0a01 	vstr	s1, [sp, #4]
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:254
+ 800022a:	edcd 0a01 	vstr	s1, [sp, #4]
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:313
 	struct twofloats sine_cosine = fsine_cosine(ref_current.ang);
- 800022c:	f7ff ffac 	bl	8000188 <fsine_cosine>
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:262
+ 800022e:	f7ff ffab 	bl	8000188 <fsine_cosine>
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:321
 	error.y = ref.y - cur_total.y;
- 8000230:	eef0 7a48 	vmov.f32	s15, s16
- 8000234:	eed0 7a8b 	vfnms.f32	s15, s1, s22
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:279
-	uint16_t table[]={0b0100000001010000, 0b0101000001010000, 0b0101000001000000, 0b0101000001000000, 0b0100000001000000, 0b0100000001010000};
- 8000238:	4b35      	ldr	r3, [pc, #212]	; (8000310 <svm_correct_current_towards+0x148>)
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:261
+ 8000232:	eef0 7a48 	vmov.f32	s15, s16
+ 8000236:	eed0 7a8b 	vfnms.f32	s15, s1, s22
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:338
+	uint16_t table0[]={0b0100000001010000, 0b0101000001010000, 0b0101000001000000, 0b0101000001000000, 0b0100000001000000, 0b0100000001010000};
+ 800023a:	4b3a      	ldr	r3, [pc, #232]	; (8000324 <svm_correct_current_towards+0x15c>)
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:320
 	error.x = ref.x - cur_total.x;
- 800023a:	eeb0 7a49 	vmov.f32	s14, s18
- 800023e:	ee90 7a0b 	vfnms.f32	s14, s0, s22
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:279
-	uint16_t table[]={0b0100000001010000, 0b0101000001010000, 0b0101000001000000, 0b0101000001000000, 0b0100000001000000, 0b0100000001010000};
- 8000242:	689a      	ldr	r2, [r3, #8]
- 8000244:	6818      	ldr	r0, [r3, #0]
- 8000246:	6859      	ldr	r1, [r3, #4]
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:270
+ 800023c:	eeb0 7a49 	vmov.f32	s14, s18
+ 8000240:	ee90 7a0b 	vfnms.f32	s14, s0, s22
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:338
+	uint16_t table0[]={0b0100000001010000, 0b0101000001010000, 0b0101000001000000, 0b0101000001000000, 0b0100000001000000, 0b0100000001010000};
+ 8000244:	6859      	ldr	r1, [r3, #4]
+ 8000246:	689a      	ldr	r2, [r3, #8]
+ 8000248:	6818      	ldr	r0, [r3, #0]
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:329
 		float temp = switch_state_vectors[i].x * error.x + switch_state_vectors[i].y * error.y;
- 8000248:	eeb0 6a67 	vmov.f32	s12, s15
- 800024c:	eef6 6a00 	vmov.f32	s13, #96	; 0x3f000000  0.5
- 8000250:	eea7 6a29 	vfma.f32	s12, s14, s19
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:279
-	uint16_t table[]={0b0100000001010000, 0b0101000001010000, 0b0101000001000000, 0b0101000001000000, 0b0100000001000000, 0b0100000001010000};
- 8000254:	ab05      	add	r3, sp, #20
- 8000256:	c307      	stmia	r3!, {r0, r1, r2}
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:270
+ 800024a:	eeb0 6a67 	vmov.f32	s12, s15
+ 800024e:	eef6 6a00 	vmov.f32	s13, #96	; 0x3f000000  0.5
+ 8000252:	eea7 6a29 	vfma.f32	s12, s14, s19
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:338
+	uint16_t table0[]={0b0100000001010000, 0b0101000001010000, 0b0101000001000000, 0b0101000001000000, 0b0100000001000000, 0b0100000001010000};
+ 8000256:	c407      	stmia	r4!, {r0, r1, r2}
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:329
 		float temp = switch_state_vectors[i].x * error.x + switch_state_vectors[i].y * error.y;
  8000258:	ee67 6aa6 	vmul.f32	s13, s15, s13
  800025c:	ee67 8aa8 	vmul.f32	s17, s15, s17
  8000260:	eeb0 5a66 	vmov.f32	s10, s13
  8000264:	eea7 5a2a 	vfma.f32	s10, s14, s21
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:280
-	TIM1->CCMR1=table[index_best];
- 8000268:	aa08      	add	r2, sp, #32
- 800026a:	eeb4 6ae9 	vcmpe.f32	s12, s19
- 800026e:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:270
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:339
+	uint16_t table1[]={0b0100000001000000, 0b0100000001000000, 0b0100000001000000, 0b0100000001010000, 0b0100000001010000, 0b0100000001010000};
+ 8000268:	f853 0f0c 	ldr.w	r0, [r3, #12]!
+ 800026c:	eeb4 6ae9 	vcmpe.f32	s12, s19
+ 8000270:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:329
 		float temp = switch_state_vectors[i].x * error.x + switch_state_vectors[i].y * error.y;
- 8000272:	eef0 5a68 	vmov.f32	s11, s17
- 8000276:	bfd8      	it	le
- 8000278:	eeb0 6a69 	vmovle.f32	s12, s19
- 800027c:	eee7 5a2a 	vfma.f32	s11, s14, s21
- 8000280:	eeb4 6ac5 	vcmpe.f32	s12, s10
- 8000284:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
- 8000288:	bf48      	it	mi
- 800028a:	eeb0 6a45 	vmovmi.f32	s12, s10
- 800028e:	eed7 7a29 	vfnms.f32	s15, s14, s19
- 8000292:	bf4c      	ite	mi
- 8000294:	2301      	movmi	r3, #1
- 8000296:	2300      	movpl	r3, #0
- 8000298:	eeb4 6ae5 	vcmpe.f32	s12, s11
- 800029c:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
- 80002a0:	bf48      	it	mi
- 80002a2:	eeb0 6a65 	vmovmi.f32	s12, s11
- 80002a6:	eee7 8a0a 	vfma.f32	s17, s14, s20
- 80002aa:	bf48      	it	mi
- 80002ac:	2302      	movmi	r3, #2
- 80002ae:	eeb4 6ae7 	vcmpe.f32	s12, s15
- 80002b2:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
- 80002b6:	bf58      	it	pl
- 80002b8:	eef0 7a46 	vmovpl.f32	s15, s12
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:280
-	TIM1->CCMR1=table[index_best];
- 80002bc:	eee7 6a0a 	vfma.f32	s13, s14, s20
- 80002c0:	bf48      	it	mi
- 80002c2:	2303      	movmi	r3, #3
- 80002c4:	eef4 7ae8 	vcmpe.f32	s15, s17
- 80002c8:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
- 80002cc:	bf48      	it	mi
- 80002ce:	eef0 7a68 	vmovmi.f32	s15, s17
- 80002d2:	eef4 6ae7 	vcmpe.f32	s13, s15
+ 8000274:	eef0 5a68 	vmov.f32	s11, s17
+ 8000278:	bfd8      	it	le
+ 800027a:	eeb0 6a69 	vmovle.f32	s12, s19
+ 800027e:	eee7 5a2a 	vfma.f32	s11, s14, s21
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:339
+	uint16_t table1[]={0b0100000001000000, 0b0100000001000000, 0b0100000001000000, 0b0100000001010000, 0b0100000001010000, 0b0100000001010000};
+ 8000282:	689a      	ldr	r2, [r3, #8]
+ 8000284:	6859      	ldr	r1, [r3, #4]
+ 8000286:	eeb4 6ac5 	vcmpe.f32	s12, s10
+ 800028a:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
+ 800028e:	bf48      	it	mi
+ 8000290:	eeb0 6a45 	vmovmi.f32	s12, s10
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:329
+		float temp = switch_state_vectors[i].x * error.x + switch_state_vectors[i].y * error.y;
+ 8000294:	eed7 7a29 	vfnms.f32	s15, s14, s19
+ 8000298:	bf4c      	ite	mi
+ 800029a:	2301      	movmi	r3, #1
+ 800029c:	2300      	movpl	r3, #0
+ 800029e:	eeb4 6ae5 	vcmpe.f32	s12, s11
+ 80002a2:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
+ 80002a6:	bf48      	it	mi
+ 80002a8:	eeb0 6a65 	vmovmi.f32	s12, s11
+ 80002ac:	eee7 8a0a 	vfma.f32	s17, s14, s20
+ 80002b0:	bf48      	it	mi
+ 80002b2:	2302      	movmi	r3, #2
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:339
+	uint16_t table1[]={0b0100000001000000, 0b0100000001000000, 0b0100000001000000, 0b0100000001010000, 0b0100000001010000, 0b0100000001010000};
+ 80002b4:	ac07      	add	r4, sp, #28
+ 80002b6:	eeb4 6ae7 	vcmpe.f32	s12, s15
+ 80002ba:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
+ 80002be:	bf58      	it	pl
+ 80002c0:	eef0 7a46 	vmovpl.f32	s15, s12
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:340
+	TIM1->CCMR1=table0[index_best];
+ 80002c4:	eee7 6a0a 	vfma.f32	s13, s14, s20
+ 80002c8:	bf48      	it	mi
+ 80002ca:	2303      	movmi	r3, #3
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:339
+	uint16_t table1[]={0b0100000001000000, 0b0100000001000000, 0b0100000001000000, 0b0100000001010000, 0b0100000001010000, 0b0100000001010000};
+ 80002cc:	c407      	stmia	r4!, {r0, r1, r2}
+ 80002ce:	eef4 7ae8 	vcmpe.f32	s15, s17
+ 80002d2:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:340
+	TIM1->CCMR1=table0[index_best];
  80002d6:	bf48      	it	mi
- 80002d8:	2304      	movmi	r3, #4
- 80002da:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
- 80002de:	bfc8      	it	gt
- 80002e0:	2305      	movgt	r3, #5
- 80002e2:	eb02 0343 	add.w	r3, r2, r3, lsl #1
- 80002e6:	f833 3c0c 	ldrh.w	r3, [r3, #-12]
- 80002ea:	8323      	strh	r3, [r4, #24]
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:298
-	 * .4byte 0b01000000010100000101000001000000
-	 * .4byte 0b01000000010100000100000001000000
-	 * .4byte 0b01000000010100000100000001010000
-	 * .pool
-	 */
+ 80002d8:	eef0 7a68 	vmovmi.f32	s15, s17
+ 80002dc:	eef4 6ae7 	vcmpe.f32	s13, s15
+ 80002e0:	bf48      	it	mi
+ 80002e2:	2304      	movmi	r3, #4
+ 80002e4:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
+ 80002e8:	aa0a      	add	r2, sp, #40	; 0x28
+ 80002ea:	bfc8      	it	gt
+ 80002ec:	2305      	movgt	r3, #5
+ 80002ee:	eb02 0343 	add.w	r3, r2, r3, lsl #1
+ 80002f2:	f833 2c18 	ldrh.w	r2, [r3, #-24]
+ 80002f6:	832a      	strh	r2, [r5, #24]
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:341
+	TIM1->CCMR2=table1[index_best];
+ 80002f8:	f833 3c0c 	ldrh.w	r3, [r3, #-12]
+ 80002fc:	83ab      	strh	r3, [r5, #28]
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:342
 }
- 80002ec:	b008      	add	sp, #32
- 80002ee:	ecbd 8b08 	vpop	{d8-d11}
- 80002f2:	bd10      	pop	{r4, pc}
- 80002f4:	200010d4 	.word	0x200010d4
- 80002f8:	200010d8 	.word	0x200010d8
- 80002fc:	200010dc 	.word	0x200010dc
- 8000300:	40010000 	.word	0x40010000
- 8000304:	00000000 	.word	0x00000000
- 8000308:	bf5db3d7 	.word	0xbf5db3d7
- 800030c:	3f5db3d7 	.word	0x3f5db3d7
- 8000310:	080003e8 	.word	0x080003e8
+ 80002fe:	b00b      	add	sp, #44	; 0x2c
+ 8000300:	ecbd 8b08 	vpop	{d8-d11}
+ 8000304:	bd30      	pop	{r4, r5, pc}
+ 8000306:	bf00      	nop
+ 8000308:	200010d4 	.word	0x200010d4
+ 800030c:	200010d8 	.word	0x200010d8
+ 8000310:	200010dc 	.word	0x200010dc
+ 8000314:	40010000 	.word	0x40010000
+ 8000318:	00000000 	.word	0x00000000
+ 800031c:	bf5db3d7 	.word	0xbf5db3d7
+ 8000320:	3f5db3d7 	.word	0x3f5db3d7
+ 8000324:	080003f8 	.word	0x080003f8
 
-08000314 <TIM2_IRQHandler>:
+08000328 <TIM2_IRQHandler>:
 process_data():
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:202
-	i_a = (((float)adc_circ_buffer[0].i_a) - current_count_midpoint) * current_per_count;
- 8000314:	4927      	ldr	r1, [pc, #156]	; (80003b4 <TIM2_IRQHandler+0xa0>)
- 8000316:	eddf 6a28 	vldr	s13, [pc, #160]	; 80003b8 <TIM2_IRQHandler+0xa4>
- 800031a:	888a      	ldrh	r2, [r1, #4]
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:203
-	i_b = (((float)adc_circ_buffer[0].i_b) - current_count_midpoint) * current_per_count;
- 800031c:	88cb      	ldrh	r3, [r1, #6]
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:204
-	rotor_e_pos = finvtan2(adc_circ_buffer[0].v_rotor_x, adc_circ_buffer[0].v_rotor_y) * n_polepairs_per_poles_sense_magnet;//wraparound?
- 800031e:	8948      	ldrh	r0, [r1, #10]
- 8000320:	8989      	ldrh	r1, [r1, #12]
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:202
-	i_a = (((float)adc_circ_buffer[0].i_a) - current_count_midpoint) * current_per_count;
- 8000322:	b292      	uxth	r2, r2
- 8000324:	ee07 2a90 	vmov	s15, r2
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:203
-	i_b = (((float)adc_circ_buffer[0].i_b) - current_count_midpoint) * current_per_count;
- 8000328:	b29b      	uxth	r3, r3
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:262
+	i_a = ((float)adc_circ_buffer[0].i_a) * current_per_count - current_midpoint;
+ 8000328:	4926      	ldr	r1, [pc, #152]	; (80003c4 <TIM2_IRQHandler+0x9c>)
+ 800032a:	eddf 6a27 	vldr	s13, [pc, #156]	; 80003c8 <TIM2_IRQHandler+0xa0>
+ 800032e:	888a      	ldrh	r2, [r1, #4]
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:263
+	i_b = ((float)adc_circ_buffer[0].i_b) * current_per_count - current_midpoint;
+ 8000330:	88cb      	ldrh	r3, [r1, #6]
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:264
+	rotor_e_pos = finvtan2(adc_circ_buffer[0].v_rotor_x, adc_circ_buffer[0].v_rotor_y) * n_polepairs_per_poles_sense_magnet;//have arctan output 32bit fixed point keep it there till svm. does wraparound also work like this on multiplication?
+ 8000332:	8948      	ldrh	r0, [r1, #10]
+ 8000334:	8989      	ldrh	r1, [r1, #12]
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:262
+	i_a = ((float)adc_circ_buffer[0].i_a) * current_per_count - current_midpoint;
+ 8000336:	b292      	uxth	r2, r2
+ 8000338:	ee07 2a90 	vmov	s15, r2
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:263
+	i_b = ((float)adc_circ_buffer[0].i_b) * current_per_count - current_midpoint;
+ 800033c:	b29b      	uxth	r3, r3
 TIM2_IRQHandler():
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:324
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:368
 
 void wait(uint32_t ticks){
 
 }
 
 void TIM2_IRQHandler(){
- 800032a:	b530      	push	{r4, r5, lr}
+ 800033e:	b530      	push	{r4, r5, lr}
 process_data():
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:202
-	i_a = (((float)adc_circ_buffer[0].i_a) - current_count_midpoint) * current_per_count;
- 800032c:	eeb8 7a67 	vcvt.f32.u32	s14, s15
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:203
-	i_b = (((float)adc_circ_buffer[0].i_b) - current_count_midpoint) * current_per_count;
- 8000330:	ee07 3a90 	vmov	s15, r3
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:204
-	rotor_e_pos = finvtan2(adc_circ_buffer[0].v_rotor_x, adc_circ_buffer[0].v_rotor_y) * n_polepairs_per_poles_sense_magnet;//wraparound?
- 8000334:	b283      	uxth	r3, r0
- 8000336:	ee00 3a10 	vmov	s0, r3
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:203
-	i_b = (((float)adc_circ_buffer[0].i_b) - current_count_midpoint) * current_per_count;
- 800033a:	eef8 7a67 	vcvt.f32.u32	s15, s15
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:204
-	rotor_e_pos = finvtan2(adc_circ_buffer[0].v_rotor_x, adc_circ_buffer[0].v_rotor_y) * n_polepairs_per_poles_sense_magnet;//wraparound?
- 800033e:	b28b      	uxth	r3, r1
- 8000340:	ee00 3a90 	vmov	s1, r3
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:202
-	i_a = (((float)adc_circ_buffer[0].i_a) - current_count_midpoint) * current_per_count;
- 8000344:	ee37 7a66 	vsub.f32	s14, s14, s13
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:203
-	i_b = (((float)adc_circ_buffer[0].i_b) - current_count_midpoint) * current_per_count;
- 8000348:	ee77 7ae6 	vsub.f32	s15, s15, s13
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:202
-	i_a = (((float)adc_circ_buffer[0].i_a) - current_count_midpoint) * current_per_count;
- 800034c:	4d1b      	ldr	r5, [pc, #108]	; (80003bc <TIM2_IRQHandler+0xa8>)
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:203
-	i_b = (((float)adc_circ_buffer[0].i_b) - current_count_midpoint) * current_per_count;
- 800034e:	4c1c      	ldr	r4, [pc, #112]	; (80003c0 <TIM2_IRQHandler+0xac>)
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:202
-	i_a = (((float)adc_circ_buffer[0].i_a) - current_count_midpoint) * current_per_count;
- 8000350:	ed85 7a00 	vstr	s14, [r5]
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:262
+	i_a = ((float)adc_circ_buffer[0].i_a) * current_per_count - current_midpoint;
+ 8000340:	eeb8 7a67 	vcvt.f32.u32	s14, s15
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:263
+	i_b = ((float)adc_circ_buffer[0].i_b) * current_per_count - current_midpoint;
+ 8000344:	ee07 3a90 	vmov	s15, r3
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:264
+	rotor_e_pos = finvtan2(adc_circ_buffer[0].v_rotor_x, adc_circ_buffer[0].v_rotor_y) * n_polepairs_per_poles_sense_magnet;//have arctan output 32bit fixed point keep it there till svm. does wraparound also work like this on multiplication?
+ 8000348:	b283      	uxth	r3, r0
+ 800034a:	ee00 3a10 	vmov	s0, r3
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:263
+	i_b = ((float)adc_circ_buffer[0].i_b) * current_per_count - current_midpoint;
+ 800034e:	eef8 7a67 	vcvt.f32.u32	s15, s15
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:264
+	rotor_e_pos = finvtan2(adc_circ_buffer[0].v_rotor_x, adc_circ_buffer[0].v_rotor_y) * n_polepairs_per_poles_sense_magnet;//have arctan output 32bit fixed point keep it there till svm. does wraparound also work like this on multiplication?
+ 8000352:	b28b      	uxth	r3, r1
+ 8000354:	ee00 3a90 	vmov	s1, r3
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:262
+	i_a = ((float)adc_circ_buffer[0].i_a) * current_per_count - current_midpoint;
+ 8000358:	ee37 7a66 	vsub.f32	s14, s14, s13
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:263
+	i_b = ((float)adc_circ_buffer[0].i_b) * current_per_count - current_midpoint;
+ 800035c:	ee77 7ae6 	vsub.f32	s15, s15, s13
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:262
+	i_a = ((float)adc_circ_buffer[0].i_a) * current_per_count - current_midpoint;
+ 8000360:	4d1a      	ldr	r5, [pc, #104]	; (80003cc <TIM2_IRQHandler+0xa4>)
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:263
+	i_b = ((float)adc_circ_buffer[0].i_b) * current_per_count - current_midpoint;
+ 8000362:	4c1b      	ldr	r4, [pc, #108]	; (80003d0 <TIM2_IRQHandler+0xa8>)
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:262
+	i_a = ((float)adc_circ_buffer[0].i_a) * current_per_count - current_midpoint;
+ 8000364:	ed85 7a00 	vstr	s14, [r5]
 TIM2_IRQHandler():
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:324
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:368
 void TIM2_IRQHandler(){
- 8000354:	b083      	sub	sp, #12
+ 8000368:	b083      	sub	sp, #12
 process_data():
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:204
-	rotor_e_pos = finvtan2(adc_circ_buffer[0].v_rotor_x, adc_circ_buffer[0].v_rotor_y) * n_polepairs_per_poles_sense_magnet;//wraparound?
- 8000356:	eef8 0a60 	vcvt.f32.u32	s1, s1
- 800035a:	eeb8 0a40 	vcvt.f32.u32	s0, s0
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:203
-	i_b = (((float)adc_circ_buffer[0].i_b) - current_count_midpoint) * current_per_count;
- 800035e:	edc4 7a00 	vstr	s15, [r4]
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:204
-	rotor_e_pos = finvtan2(adc_circ_buffer[0].v_rotor_x, adc_circ_buffer[0].v_rotor_y) * n_polepairs_per_poles_sense_magnet;//wraparound?
- 8000362:	f7ff ff2d 	bl	80001c0 <finvtan2>
- 8000366:	4a17      	ldr	r2, [pc, #92]	; (80003c4 <TIM2_IRQHandler+0xb0>)
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:207
-	speed = rotor_e_pos - prev_rotor_e_pos;//wraparound?
- 8000368:	4b17      	ldr	r3, [pc, #92]	; (80003c8 <TIM2_IRQHandler+0xb4>)
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:204
-	rotor_e_pos = finvtan2(adc_circ_buffer[0].v_rotor_x, adc_circ_buffer[0].v_rotor_y) * n_polepairs_per_poles_sense_magnet;//wraparound?
- 800036a:	7812      	ldrb	r2, [r2, #0]
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:207
-	speed = rotor_e_pos - prev_rotor_e_pos;//wraparound?
- 800036c:	ed93 7a00 	vldr	s14, [r3]
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:209
-	rotor_e_pos = rotor_e_pos + speed * prop_delay;//this can be incoporated in the mpta lut(?)
- 8000370:	eddf 0a16 	vldr	s1, [pc, #88]	; 80003cc <TIM2_IRQHandler+0xb8>
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:264
+	rotor_e_pos = finvtan2(adc_circ_buffer[0].v_rotor_x, adc_circ_buffer[0].v_rotor_y) * n_polepairs_per_poles_sense_magnet;//have arctan output 32bit fixed point keep it there till svm. does wraparound also work like this on multiplication?
+ 800036a:	eef8 0a60 	vcvt.f32.u32	s1, s1
+ 800036e:	eeb8 0a40 	vcvt.f32.u32	s0, s0
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:263
+	i_b = ((float)adc_circ_buffer[0].i_b) * current_per_count - current_midpoint;
+ 8000372:	edc4 7a00 	vstr	s15, [r4]
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:264
+	rotor_e_pos = finvtan2(adc_circ_buffer[0].v_rotor_x, adc_circ_buffer[0].v_rotor_y) * n_polepairs_per_poles_sense_magnet;//have arctan output 32bit fixed point keep it there till svm. does wraparound also work like this on multiplication?
+ 8000376:	f7ff ff23 	bl	80001c0 <finvtan2>
+ 800037a:	4a16      	ldr	r2, [pc, #88]	; (80003d4 <TIM2_IRQHandler+0xac>)
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:267
+	speed = rotor_e_pos - prev_rotor_e_pos;
+ 800037c:	4b16      	ldr	r3, [pc, #88]	; (80003d8 <TIM2_IRQHandler+0xb0>)
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:264
+	rotor_e_pos = finvtan2(adc_circ_buffer[0].v_rotor_x, adc_circ_buffer[0].v_rotor_y) * n_polepairs_per_poles_sense_magnet;//have arctan output 32bit fixed point keep it there till svm. does wraparound also work like this on multiplication?
+ 800037e:	7812      	ldrb	r2, [r2, #0]
 calculate_desired_current():
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:227
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:286
 	out.mag = requested_current * torque_per_amp;
- 8000374:	4916      	ldr	r1, [pc, #88]	; (80003d0 <TIM2_IRQHandler+0xbc>)
+ 8000380:	4916      	ldr	r1, [pc, #88]	; (80003dc <TIM2_IRQHandler+0xb4>)
 process_data():
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:204
-	rotor_e_pos = finvtan2(adc_circ_buffer[0].v_rotor_x, adc_circ_buffer[0].v_rotor_y) * n_polepairs_per_poles_sense_magnet;//wraparound?
- 8000376:	ee07 2a90 	vmov	s15, r2
- 800037a:	eef8 7ae7 	vcvt.f32.s32	s15, s15
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:267
+	speed = rotor_e_pos - prev_rotor_e_pos;
+ 8000382:	ed93 7a00 	vldr	s14, [r3]
 calculate_desired_current():
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:227
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:286
 	out.mag = requested_current * torque_per_amp;
- 800037e:	4a15      	ldr	r2, [pc, #84]	; (80003d4 <TIM2_IRQHandler+0xc0>)
- 8000380:	edd1 6a00 	vldr	s13, [r1]
- 8000384:	ed92 6a00 	vldr	s12, [r2]
+ 8000386:	edd1 6a00 	vldr	s13, [r1]
+ 800038a:	eddf 0a15 	vldr	s1, [pc, #84]	; 80003e0 <TIM2_IRQHandler+0xb8>
 process_data():
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:207
-	speed = rotor_e_pos - prev_rotor_e_pos;//wraparound?
- 8000388:	4913      	ldr	r1, [pc, #76]	; (80003d8 <TIM2_IRQHandler+0xc4>)
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:209
-	rotor_e_pos = rotor_e_pos + speed * prop_delay;//this can be incoporated in the mpta lut(?)
- 800038a:	4a14      	ldr	r2, [pc, #80]	; (80003dc <TIM2_IRQHandler+0xc8>)
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:204
-	rotor_e_pos = finvtan2(adc_circ_buffer[0].v_rotor_x, adc_circ_buffer[0].v_rotor_y) * n_polepairs_per_poles_sense_magnet;//wraparound?
- 800038c:	ee67 7a80 	vmul.f32	s15, s15, s0
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:264
+	rotor_e_pos = finvtan2(adc_circ_buffer[0].v_rotor_x, adc_circ_buffer[0].v_rotor_y) * n_polepairs_per_poles_sense_magnet;//have arctan output 32bit fixed point keep it there till svm. does wraparound also work like this on multiplication?
+ 800038e:	4915      	ldr	r1, [pc, #84]	; (80003e4 <TIM2_IRQHandler+0xbc>)
+ 8000390:	ee07 2a90 	vmov	s15, r2
+ 8000394:	eef8 7ae7 	vcvt.f32.s32	s15, s15
+calculate_desired_current():
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:286
+	out.mag = requested_current * torque_per_amp;
+ 8000398:	4a13      	ldr	r2, [pc, #76]	; (80003e8 <TIM2_IRQHandler+0xc0>)
+process_data():
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:264
+	rotor_e_pos = finvtan2(adc_circ_buffer[0].v_rotor_x, adc_circ_buffer[0].v_rotor_y) * n_polepairs_per_poles_sense_magnet;//have arctan output 32bit fixed point keep it there till svm. does wraparound also work like this on multiplication?
+ 800039a:	ee67 7a80 	vmul.f32	s15, s15, s0
+ 800039e:	ed92 6a00 	vldr	s12, [r2]
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:267
+	speed = rotor_e_pos - prev_rotor_e_pos;
+ 80003a2:	4a12      	ldr	r2, [pc, #72]	; (80003ec <TIM2_IRQHandler+0xc4>)
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:264
+	rotor_e_pos = finvtan2(adc_circ_buffer[0].v_rotor_x, adc_circ_buffer[0].v_rotor_y) * n_polepairs_per_poles_sense_magnet;//have arctan output 32bit fixed point keep it there till svm. does wraparound also work like this on multiplication?
+ 80003a4:	edc1 7a00 	vstr	s15, [r1]
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:267
+	speed = rotor_e_pos - prev_rotor_e_pos;
+ 80003a8:	ee37 7ac7 	vsub.f32	s14, s15, s14
 TIM2_IRQHandler():
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:327
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:371
 	//turn off dma
 	process_data();
 	svm_correct_current_towards(calculate_desired_current());
- 8000390:	ee26 0a26 	vmul.f32	s0, s12, s13
+ 80003ac:	ee26 0a26 	vmul.f32	s0, s12, s13
+ 80003b0:	ee77 0aa0 	vadd.f32	s1, s15, s1
 process_data():
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:207
-	speed = rotor_e_pos - prev_rotor_e_pos;//wraparound?
- 8000394:	ee37 7ac7 	vsub.f32	s14, s15, s14
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:208
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:268
 	prev_rotor_e_pos = rotor_e_pos;
- 8000398:	edc3 7a00 	vstr	s15, [r3]
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:209
-	rotor_e_pos = rotor_e_pos + speed * prop_delay;//this can be incoporated in the mpta lut(?)
- 800039c:	eee7 7a20 	vfma.f32	s15, s14, s1
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:207
-	speed = rotor_e_pos - prev_rotor_e_pos;//wraparound?
- 80003a0:	ed81 7a00 	vstr	s14, [r1]
+ 80003b4:	edc3 7a00 	vstr	s15, [r3]
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:267
+	speed = rotor_e_pos - prev_rotor_e_pos;
+ 80003b8:	ed82 7a00 	vstr	s14, [r2]
 TIM2_IRQHandler():
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:327
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:371
 	svm_correct_current_towards(calculate_desired_current());
- 80003a4:	ee77 0aa0 	vadd.f32	s1, s15, s1
-process_data():
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:209
-	rotor_e_pos = rotor_e_pos + speed * prop_delay;//this can be incoporated in the mpta lut(?)
- 80003a8:	edc2 7a00 	vstr	s15, [r2]
-TIM2_IRQHandler():
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:327
-	svm_correct_current_towards(calculate_desired_current());
- 80003ac:	f7ff ff0c 	bl	80001c8 <svm_correct_current_towards>
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:328
+ 80003bc:	f7ff ff04 	bl	80001c8 <svm_correct_current_towards>
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:372
 }
- 80003b0:	b003      	add	sp, #12
- 80003b2:	bd30      	pop	{r4, r5, pc}
- 80003b4:	20001004 	.word	0x20001004
- 80003b8:	45000000 	.word	0x45000000
- 80003bc:	200010d4 	.word	0x200010d4
- 80003c0:	200010d8 	.word	0x200010d8
- 80003c4:	200010c8 	.word	0x200010c8
- 80003c8:	200010e0 	.word	0x200010e0
- 80003cc:	00000000 	.word	0x00000000
- 80003d0:	200010cc 	.word	0x200010cc
- 80003d4:	20001000 	.word	0x20001000
- 80003d8:	200010e4 	.word	0x200010e4
- 80003dc:	200010d0 	.word	0x200010d0
+ 80003c0:	b003      	add	sp, #12
+ 80003c2:	bd30      	pop	{r4, r5, pc}
+ 80003c4:	20001004 	.word	0x20001004
+ 80003c8:	42480000 	.word	0x42480000
+ 80003cc:	200010d4 	.word	0x200010d4
+ 80003d0:	200010d8 	.word	0x200010d8
+ 80003d4:	200010c8 	.word	0x200010c8
+ 80003d8:	200010e0 	.word	0x200010e0
+ 80003dc:	200010cc 	.word	0x200010cc
+ 80003e0:	00000000 	.word	0x00000000
+ 80003e4:	200010d0 	.word	0x200010d0
+ 80003e8:	20001000 	.word	0x20001000
+ 80003ec:	200010e4 	.word	0x200010e4
 
-080003e0 <TIM3_IRQHandler>:
+080003f0 <TIM3_IRQHandler>:
 TIM3_IRQHandler():
-/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:330
+/home/david/Documents/workspace-arm/motor_controller/Debug/../main.c:374
 
 void TIM3_IRQHandler(){
- 80003e0:	4770      	bx	lr
- 80003e2:	bf00      	nop
+ 80003f0:	4770      	bx	lr
+ 80003f2:	bf00      	nop
 
-080003e4 <default_handler>:
+080003f4 <default_handler>:
 DMA1_Stream3_IRQHandler():
 /home/david/Documents/workspace-arm/motor_controller/Debug/../startup.S:406
 
@@ -655,8 +672,11 @@ DMA1_Stream3_IRQHandler():
 .thumb_func
 	default_handler:
 	b.n default_handler
- 80003e4:	e7fe      	b.n	80003e4 <default_handler>
- 80003e6:	bf00      	nop
- 80003e8:	50504050 	.word	0x50504050
- 80003ec:	50405040 	.word	0x50405040
- 80003f0:	40504040 	.word	0x40504040
+ 80003f4:	e7fe      	b.n	80003f4 <default_handler>
+ 80003f6:	bf00      	nop
+ 80003f8:	50504050 	.word	0x50504050
+ 80003fc:	50405040 	.word	0x50405040
+ 8000400:	40504040 	.word	0x40504040
+ 8000404:	40404040 	.word	0x40404040
+ 8000408:	40504040 	.word	0x40504040
+ 800040c:	40504050 	.word	0x40504050
