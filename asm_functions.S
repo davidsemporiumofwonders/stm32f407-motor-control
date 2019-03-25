@@ -6,6 +6,7 @@
 .global fsine
 .global fsine_cosine
 .global finvtan2
+.global fix32invtan2
 .global fsqrt
 
 //contents of assemly funtions (even seperate files in general) are not visible to the compiler
@@ -71,6 +72,12 @@
 .balign 4
 .thumb_func
 	finvtan2:
+	nop
+
+.section .text.fix32finvtan2,"ax",%progbits
+.balign 4
+.thumb_func
+	fix32invtan2:
 	nop
 
 .section .text.fsqrt,"ax",%progbits

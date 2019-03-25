@@ -9,16 +9,14 @@
 //back emf sensing?
 //sensorless?, automatic fault detection and switching to sensorless, what type sensors?
 //sensor less? -> speed under x? -> just apply a rotating field
-//alu and fpu in parralel?
 //register variables?
 //prolly dont need any context saving in the fpu(set on a per function basis?)
 //s16 and up need to be preserved use those for variables
 //the compiler now pushes d8-d10 can my fpu handle this, have i selected the right one
-//core coupled memory, different ram banks?
 //see if you can do better than 40khz
-//interleaved adc conversions, or parralel?
-//injected channels for bus measurement?
-//anawd to generated interrupt on bus values?
+//adc setup?
+//lower resolution on some adc channels?
+//safeties as external interrupt?
 //different clock domains?
 //backemf sensing on higset priority timer interrupt -> wait for peak and set timer accordingly?
 //data/instruction caching in both core and st implementation?
@@ -26,27 +24,24 @@
 //add torque per amp lookup table?
 //ethernet or can?
 //stacksize?
-//init order still allow optimizations?
 //interrupt (subroutine calls?) stacking behavior?
 //interrupt priorities, turn of nestng globally? (i would be nice if advance tracking could be interrupted though)
 //max speed per amp vs max speed per energy?
 //peak detection once per x rotations?
-//calculate speed in peak detection?
 //only 4 32 bit instructions of prefetch, 5 waitstates->problem?
 //also check core prefetch for sequential 32 bit instructions
-//io compensation cell?
 //divide by zero handling?
 //dsp instuctions!(?)
-//stack in ram(does the cpu always lock out the dma when stacking)?
+//stack in ccmram(does the cpu always lock out the dma when stacking)?
 //exc_return?(in arm refman)
-//mpu?
+//all(more) angles(values) in fix 32?
 
 //defines
 #define CCMRAM __attribute__((section(".ccmram")))
 
 #define min_err_commutation 1
 #define peak_detection_window 1
-#define n_samples_averaging 1
+#define n_samples 1
 #define sin60 0.8660254
 #define sin120 sin60
 #define cos60 0.5
@@ -56,6 +51,7 @@
 #define current_per_count 1
 #define current_midpoint 50
 //#define track_max_speed_per_power
+//#define usartout
 
 //typedefs
 typedef struct {
@@ -69,14 +65,26 @@ typedef struct {
 }vector_mag_ang;
 
 typedef struct {
-	uint16_t v_dcbus;
-	uint16_t i_dcbus;
-	uint16_t i_a;
-	uint16_t i_b;
-	uint16_t i_f;
-	uint16_t v_rotor_x;
-	uint16_t v_rotor_y;
-}adc_conversions;
+	uint16_t i_a_adc1;
+	uint16_t i_a_adc2;
+	uint16_t i_b_adc1;
+	uint16_t i_b_adc2;
+	uint16_t i_f_adc1;
+	uint16_t i_f_adc2;
+	uint16_t v_rotor_x_adc1;
+	uint16_t v_rotor_x_adc2;
+	uint16_t v_rotor_y_adc1;
+	uint16_t v_rotor_y_adc2;
+}regular_adc_conversions;
+
+typedef struct {
+	uint16_t temp_adc1;
+	uint16_t temp_adc2;
+	uint16_t v_dcbus_adc1;
+	uint16_t v_dcbus_adc2;
+	uint16_t i_dcbus_adc1;
+	uint16_t i_dcbus_adc2;
+}injected_dc_conversions;
 
 extern uint32_t _sidata;
 extern uint32_t _sdata;
@@ -89,11 +97,9 @@ extern uint32_t _evtflash;
 
 
 //constants, const gets placed in text! can be changed in linker(relation to literals?)
-#ifndef track_max_speed_per_power
 const float mtpa_lut[][1];//datatype?
-#endif
 
-const uint8_t rotary_resolver_correction_lut[];
+const uint32_t rotary_resolver_correction_lut[];//datatype?
 
 const vector switch_state_vectors[] = { {0,1},
 										{sin60, cos60},
@@ -120,22 +126,22 @@ uint8_t faultcodes_index;
 float i_a;
 float i_b;
 float i_c;
-float prev_rotor_e_pos;
-float rotor_e_pos;
-float speed;
-float current_angle_advance;
+float angle_advance;
 float prev_speed_per_amp;
+ufix32 prev_rotor_e_pos;
+ufix32 rotor_e_pos;
+ufix32 speed;										//be mindful when multiplying fixed point numbers!
 
 volatile float requested_current;
-volatile adc_conversions adc_circ_buffer[sizeof(adc_conversions)*n_samples_averaging] __attribute__ ((aligned (2)));//align on 4 bytes?
+volatile regular_adc_conversions adc_circ_buffer[n_samples] __attribute__ ((aligned (2)));//align on 4 bytes?, array indexing get optimized away when size is 1?
 
 //prototypes
 void init_system(void);
 void main(void);
 void wait(uint32_t ticks);
 void calibrate_encoder(void);
-float query_encoder_table(float pos);
-float query_mtpa_table(float speed, float current);
+ufix32 query_encoder_table(ufix32 pos);
+float query_mtpa_table(ufix32 speed, float current);
 void process_data(void);
 vector_mag_ang calculate_desired_current(void);
 void svm_correct_current_towards(vector_mag_ang);
@@ -144,7 +150,7 @@ void optimize_advance_angle(void);
 
 extern void TIM2_IRQHandler(void);
 extern void TIM3_IRQHandler(void);
-extern void TIM4_IRQHandler(void);
+extern void TIM5_IRQHandler(void);
 
 void init_system(){
 	//setup system clocks
@@ -180,11 +186,16 @@ void init_system(){
 		*(dst++) = 0;
 	}
 
+	//setup pvd
+	PWR->CR = PWR_CR_VOS_0 & PWR_CR_PVDE & (0b110<<5);
+
 	//setup fpu, load freq used constants
 	SCB->CPACR = 0b1111<<20;
 	//asm volatile("vmov.f32 s5, #0");
 	//synch barriers?
+
 	//setup eeprom emulation?
+
 	//configure peripheral clocks
 	RCC->AHB1ENR = RCC_AHB1ENR_GPIOAEN & RCC_AHB1ENR_CCMDATARAMEN & RCC_AHB1ENR_DMA2EN;
 	RCC->APB1ENR = RCC_APB1ENR_TIM2EN & RCC_APB1ENR_TIM3EN & RCC_APB1ENR_TIM4EN;
@@ -197,7 +208,7 @@ void init_system(){
 		*(dst++) = *(src++);
 	}
 
-	//relocate vector table to ccram
+	//use vector table in ccram
 	SCB->VTOR = &_sccmram;
 
 	//turn on/off peripherals?
@@ -209,9 +220,26 @@ void init_system(){
 //	GPIOA->PUPDR;//pullups
 //	GPIOA->AFR;//alternate function select
 
-	//setup usart?
+#ifdef usartout
+	//setup usart
+#endif
+
+	//setup ethernet/can
+
+	//negtiote parameters with main controller
+
+	//safety checks
+
 	//setup adc
-	ADC1->CR1 = (0b00<<24) & ADC_CR1_AWDIE;//res?, jauto?, single anawd channel(use anawd at all?)
+	ADC->CCR = (0b10 << 16) & (0b10 << 14) & ADC_CCR_DMA & 0b101;//combined regular and injected mode?
+	ADC1->CR1 = ADC_CR1_AWDEN & ADC_CR1_AWDSGL & ADC_CR1_SCAN & ADC_CR1_AWDIE & 0;
+	ADC1->CR2 = ADC_CR2_CONT & ADC_CR2_ADON;
+	ADC1->SMPR1;
+	ADC1->HTR;
+	ADC1->LTR;
+	ADC1->SQR1 = ((sizeof(regular_adc_conversions)/sizeof(uint16_t)/2)<<20);
+	ADC1->SQR3;
+	//ADC2;
 
 	//setup dma
 
@@ -221,6 +249,7 @@ void init_system(){
 	TIM1->CR1=0;//set deadtime prescaler
 	TIM1->CCER = TIM_CCER_CC1E & TIM_CCER_CC1NE & TIM_CCER_CC2E & TIM_CCER_CC2NE & TIM_CCER_CC3E & TIM_CCER_CC3NE;//complentary output polarity?
 	TIM1->BDTR = TIM_BDTR_MOE ;//set deadtime
+	//init override bits?
 
 	//setup 40khz loop on tim2
 	TIM2->CR1 = TIM_CR1_CEN;
@@ -229,20 +258,19 @@ void init_system(){
 	TIM2->PSC = 10;
 	TIM2->CCR1 = 10;
 
-	//setup stator field timer on tim3?
+	//setup backemf timer on tim3?
 	TIM3->CR1 = TIM_CR1_CEN;
 	TIM3->DIER = TIM_DIER_UIE;
 	TIM3->EGR = TIM_EGR_UG;
 	TIM3->PSC = 10;
 	TIM3->CCR1 = 10;
 
+	//setup injected channels timer? on tim4?
+
 #ifdef track_max_speed_per_power
-	//setup best advance tracking on tim4?
+	//setup best advance tracking on tim5?
+	//100 herz?
 #endif
-
-	//setup ethernet/can
-
-	//negtiote parameters with main controller
 
 	//setup interrupts, priorities
 	//NVIC->ISER;
@@ -257,11 +285,15 @@ void main(){
 }
 
 void process_data(){
-	//filters and averaging?
+	//filters and averaging
+	uint16_t raw_a = (adc_circ_buffer[0].i_a_adc1 + adc_circ_buffer[0].i_a_adc2) / 2;
+	uint16_t raw_b = (adc_circ_buffer[0].i_b_adc1 + adc_circ_buffer[0].i_b_adc2) / 2;
+	uint16_t raw_x = (adc_circ_buffer[0].v_rotor_x_adc1 + adc_circ_buffer[0].v_rotor_x_adc2) / 2;
+	uint16_t raw_y = (adc_circ_buffer[0].v_rotor_y_adc1 + adc_circ_buffer[0].v_rotor_y_adc2) / 2;
 	//decode values
-	i_a = ((float)adc_circ_buffer[0].i_a) * current_per_count - current_midpoint;
-	i_b = ((float)adc_circ_buffer[0].i_b) * current_per_count - current_midpoint;
-	rotor_e_pos = finvtan2(adc_circ_buffer[0].v_rotor_x, adc_circ_buffer[0].v_rotor_y) * n_polepairs_per_poles_sense_magnet;//have arctan output 32bit fixed point keep it there till svm. does wraparound also work like this on multiplication?
+	i_a = ((float)raw_a) * current_per_count - current_midpoint;//do substraction in adc offset register(can you switch around injected and regular)?
+	i_b = ((float)raw_b) * current_per_count - current_midpoint;
+	rotor_e_pos = fix32invtan2(raw_x, raw_y) * n_polepairs_per_poles_sense_magnet;//does wraparound also work like this on multiplication?
 	//adjusts
 	rotor_e_pos = query_encoder_table(rotor_e_pos);
 	speed = rotor_e_pos - prev_rotor_e_pos;
@@ -270,20 +302,23 @@ void process_data(){
 }
 
 void stator_field_controll(){
-	//no contex saving on fpu? -> do manually here
 
 }
 
 void optimize_advance_angle(){
-	//no contex saving on fpu? -> do manually here
-	//100 herz?
 
 }
 
 vector_mag_ang calculate_desired_current(){
 	vector_mag_ang out;
-	out.ang = rotor_e_pos + query_mtpa_table(1,1);
+
+#ifdef track_max_speed_per_power
+	out.ang = (float)rotor_e_pos + angle_advance;
 	out.mag = requested_current * torque_per_amp;
+#else
+	out.ang = (float)rotor_e_pos + query_mtpa_table(speed, requested_current);
+	out.mag = requested_current * torque_per_amp;
+#endif
 
 	return out;
 }
@@ -334,7 +369,6 @@ void svm_correct_current_towards(vector_mag_ang ref_current){
 	}
 
 	//pass best to deadtime gen
-	//init override bits?
 	uint16_t table0[]={0b0100000001010000, 0b0101000001010000, 0b0101000001000000, 0b0101000001000000, 0b0100000001000000, 0b0100000001010000};
 	uint16_t table1[]={0b0100000001000000, 0b0100000001000000, 0b0100000001000000, 0b0100000001010000, 0b0100000001010000, 0b0100000001010000};
 	TIM1->CCMR1=table0[index_best];
@@ -353,11 +387,11 @@ void calibrate_encoder(){
 	}
 }
 
-float query_mtpa_table(float speed, float current){
+float query_mtpa_table(ufix32 speed, float current){
 	return 0;
 }
 
-float query_encoder_table(float pos){
+ufix32 query_encoder_table(ufix32 pos){
 	return pos;
 }
 
@@ -373,6 +407,7 @@ void TIM2_IRQHandler(){
 
 void TIM3_IRQHandler(){
 	//dma?
+	//wait for peak
 	stator_field_controll();
 }
 
