@@ -1,17 +1,12 @@
-#include "costable.h"
-#include "atantable.h"
+#include "cos_table.h"
+#include "invtan_table.h"
 
-typedef uint32_t ufix32;
-typedef uint32_t ufix16;
+typedef struct sine_cosine_struct{
+	float sine;
+	float cosine;
+} sine_cosine_struct;
 
-struct twofloats{
-	float value0;
-	float value1;
-};
-
-extern void svm_asm(void);
-extern float fsine(float i);
-extern struct twofloats fsine_cosine(float i);
-extern float finvtan2(float i0, float i1);
-extern ufix32 fix32invtan2(ufix32 i0, ufix32 i1);//single input?
+extern void svm_correct_current_towards_asm(void);
+extern sine_cosine_struct fsine_cosine(float i);
+extern ufix32 fix32invtan(ufix32 i);
 extern float fsqrt(float i);

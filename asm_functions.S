@@ -2,22 +2,18 @@
 .cpu cortex-m4
 .thumb
 
-.global svm_asm
-.global fsine
+.global svm_correct_current_towards_asm
 .global fsine_cosine
-.global finvtan2
-.global fix32invtan2
+.global fix32invtan
 .global fsqrt
 
 //contents of assemly funtions (even seperate files in general) are not visible to the compiler
-//use luts
 //load constants at startup, how to teel the compiler not to touch them?
-//returnin 2 values in c
 
-.section .text.svm_asm,"ax",%progbits
+.section .text.svm_correct_current_towards_asm,"ax",%progbits
 .balign 4
 .thumb_func
-	svm_asm:
+	svm_correct_current_towards_asm:
 	nop
 	/* add best, best , iets
 	 * ldr r0, =0x40010018
@@ -35,49 +31,38 @@
 	 * .pool
 	 */
 
-.section .text.fsine,"ax",%progbits
-.balign 4
-.thumb_func
-	fsine:
-	nop
-
 .section .text.fsine_cosine,"ax",%progbits
 .balign 4
 .thumb_func
 	fsine_cosine://no linear interpolation for now
+		push {r2}
 	    vcvt.u32.f32 s0,s0,#32
+	    .equ    label, cosine_table
+		movw    r2, #:lower16:label
+		movt    r2, #:upper16:label//keep adresses like this in a fixed register?
         vmov r0,s0
         lsls.n r1,r0,#1
 		mov r1,r0//do that branch/copy differently?
         ite mi
         submi r0, #2^32
         subpl r1, #2^32//check pairing register, condition
-		//right shift
-        .equ    label, cosine_table
-		movw    r2, #:lower16:label//when the table is placed at the top of ram this instruction does nothing
-		movt    r2, #:upper16:label
-        ldr r3, [r2, r0]
-        vmov r3, s0
-        ldr r3, [r2, r1]
-        vmov r3, s1
+		lsr r0, #18//right amount?
+		lsr r1, #18
+        ldr r0, [r2, r0]
+        ldr r1, [r2, r1]
+        vmov r0, s0//argument order correct?
+        vmov r1, s1//move as one?
+        pop {r2}
         itt cs
         vnegcs.f32 s0,s0
-        vnegcs.f32 s1,s1
+        vnegcs.f32 s1,s1//does neg also take an extra cyle if consumed immedeately?, this can be doen without fpu
         it mi
         vnegmi.f32 s1,s1
 
-
-
-.section .text.finvtan2,"ax",%progbits
+.section .text.fix32invtan,"ax",%progbits
 .balign 4
 .thumb_func
-	finvtan2:
-	nop
-
-.section .text.fix32finvtan2,"ax",%progbits
-.balign 4
-.thumb_func
-	fix32invtan2:
+	fix32invtan:
 	nop
 
 .section .text.fsqrt,"ax",%progbits

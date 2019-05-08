@@ -1,23 +1,24 @@
 MEMORY
 {
-   FLASH  (rx) : ORIGIN = 0x08000000, LENGTH = 512k
-   RAM   (rwx) : ORIGIN = 0x20000000, LENGTH = 192k
-   CCMRAM (rw) : ORIGIN = 0x10000000, LENGTH = 64k
+   FLASH  		(rx) 	: ORIGIN = 0x08000000, LENGTH = 512k
+   RAM   		(rwx) 	: ORIGIN = 0x20000000, LENGTH = 112k
+   RAM_BANK_2	(rwx)	: ORIGIN = 0x2001C000, LENGTH = 12k
+   CCMRAM 		(rw) 	: ORIGIN = 0x10000000, LENGTH = 64k
 }
 
-STACK_SIZE = 1024;
-_estack = ORIGIN(RAM) + LENGTH(RAM);
+STACK_SIZE = 8192;
+_estack = ORIGIN(CCMRAM) + LENGTH(CCMRAM);
 _sstack = _estack - STACK_SIZE;
- 
-/* Output sections */
+
 SECTIONS
 {
+	/* flash */
     .text :
     {
         /* All unused bytes set to 0xFF. */
         FILL (0xff)
         _svtflash = .;   
-        /* ISR Vector Table first */
+        /*Vector Table */
         KEEP(*(.vector_table))
  		_evtflash = .; 
  		 
@@ -35,6 +36,8 @@ SECTIONS
         _sidata = _etext;
          
     } > FLASH
+    
+    _eidata = .;
  
     /* Initialized global and static variables */
     .data :
@@ -64,22 +67,39 @@ SECTIONS
          
     } > RAM
  
-    /* Stack */
+    /* bank 2 */
+    .ram_bank_2 :
+    {
+        . = ALIGN(4);
+        _sram_bank_2 = .;
+        *(.ram_bank_2)
+        *(.ram_bank_2.*)
+        *(COMMON)
+        . = ALIGN(4);
+ 
+        _eram_bank_2 = .;
+         
+    } > RAM_BANK_2
+ 	
+ 	/*ccmram */
+    .ccmram :
+	{
+	
+    . = ALIGN(4);
+    _sccmram = .;     
+    *(.ccmram)
+    *(.ccmram*)
+    . = ALIGN(4);
+    _eccmram = .;
+
+ 	} > CCMRAM
+ 	
+ 	
+ 	/* Stack */
     . = _sstack;
     .stack :
     {
         . = . + STACK_SIZE;
-    } > RAM
+    } > CCMRAM
     
-    .ccmram :
-	{
-
-    . = ALIGN(4);
-    _sccmram = .;       /* create a global symbol at ccmram start */
-    *(.ccmram)
-    *(.ccmram*)
-    . = ALIGN(4);
-    _eccmram = .;       /* create a global symbol at ccmram end */
-
- 	} >CCMRAM AT> FLASH
 }

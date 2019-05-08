@@ -17,7 +17,7 @@
 
 Vectors:
 	.4byte  _estack
-	.4byte  main
+	.4byte  init_system
 	.4byte  NMI_Handler
   	.4byte  HardFault_Handler
   	.4byte  MemManage_Handler

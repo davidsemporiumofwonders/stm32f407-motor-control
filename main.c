@@ -1,5 +1,7 @@
 #include "stm32f4xx.h"
+#include "typedefs.h"
 #include "asm_functions.h"
+#include "motor_controll_luts.h"
 
 //todos, questions
 
@@ -7,116 +9,111 @@
 //auto find phase ordering, polartity
 //reverse?
 //back emf sensing?
-//sensorless?, automatic fault detection and switching to sensorless, what type sensors?
+//sensorless, automatic fault detection and switching to sensorless, what type sensors?
 //sensor less? -> speed under x? -> just apply a rotating field
+//dont check for sensorless sometimes when doing things for it?
 //register variables?
-//prolly dont need any context saving in the fpu(set on a per function basis?)
-//s16 and up need to be preserved use those for variables
+//s16 and up need to be preserved use those for variables, no context saving on fpu
 //the compiler now pushes d8-d10 can my fpu handle this, have i selected the right one
 //see if you can do better than 40khz
-//adc setup?
-//lower resolution on some adc channels?
-//safeties as external interrupt?
 //different clock domains?
-//backemf sensing on higset priority timer interrupt -> wait for peak and set timer accordingly?
 //data/instruction caching in both core and st implementation?
 //ideally you would request torque from the controller
 //add torque per amp lookup table?
 //ethernet or can?
-//stacksize?
 //interrupt (subroutine calls?) stacking behavior?
-//interrupt priorities, turn of nestng globally? (i would be nice if advance tracking could be interrupted though)
-//max speed per amp vs max speed per energy?
+//interrupt priorities, turn of nestng globally?
+//max speed per amp vs max speed per energy?, mtpa vs mppa?
 //peak detection once per x rotations?
 //only 4 32 bit instructions of prefetch, 5 waitstates->problem?
 //also check core prefetch for sequential 32 bit instructions
 //divide by zero handling?
 //dsp instuctions!(?)
-//stack in ccmram(does the cpu always lock out the dma when stacking)?
 //exc_return?(in arm refman)
-//all(more) angles(values) in fix 32?
+//do adc averaging?
+//fixed point?
+//just do a conventional layout of stack and vector table?
+//usefullness of dma?
+//3 adcs(?)
+//try to contain data tapping to one small block
+//software fpu stacking?
+//stacks on subroutine call?, unnessecary stacking, naked funtions, or inlines(would make some global values locals/reg variables(even as inlines instead of one big function?))
+//fpu regs to store table adresses?
+//back emf measurement: wont the current/inductance produce a volatge and foul the reading?, what did i have in mind for this?
+//derive torque(in cobination with current) from bemf(?)
+//consider a torque sensor though
+//how to handle non sinusoidial bemf?!
 
 //defines
-#define CCMRAM __attribute__((section(".ccmram")))
+#define ram_bank_2 __attribute__((section(".ram_bank_2")))
+#define align_2 __attribute__ ((aligned (2)))
+#define no_wrapper __attribute__((naked))//do this differently(?)
 
-#define min_err_commutation 1
+#define min_err_commutation 0//square of current
 #define peak_detection_window 1
+#define peak_detection_level 1
+#define first_time_peak_detection_window 1
 #define n_samples 1
-#define sin60 0.8660254
-#define sin120 sin60
-#define cos60 0.5
-#define cos120 -cos60
-#define default_can_adress something
-#define prop_delay 0
+#define default_can_adress 1
 #define current_per_count 1
 #define current_midpoint 50
-//#define track_max_speed_per_power
+//#define adjust_rotor_field
 //#define usartout
+//#define force_sensorless
+//#use_hall
 
-//typedefs
-typedef struct {
-	float x;
-	float y;
-}vector;
+enum {
+	i_a_adc1_input = 0,
+	i_a_adc2_input = 1,
+	i_b_adc3_input = 2,
+	i_b_adc1_input = 3,
+	v_rotor_x_adc2_input = 4,
+	v_rotor_x_adc3_input = 5,
+	v_rotor_y_adc1_input = 6,
+	v_rotor_y_adc2_input = 7,
+}; //adc_reg_channels_vs_inputs
 
-typedef struct {
-	float mag;
-	float ang;
-}vector_mag_ang;
+enum {
+	v_bemf_adc1 = 8,
+	temp_adc2 = 9,
+	v_dcbus_adc3 = 10,
+}; //adc_inj_channels_vs_inputs
 
 typedef struct {
 	uint16_t i_a_adc1;
 	uint16_t i_a_adc2;
+	uint16_t i_b_adc3;
 	uint16_t i_b_adc1;
-	uint16_t i_b_adc2;
-	uint16_t i_f_adc1;
-	uint16_t i_f_adc2;
-	uint16_t v_rotor_x_adc1;
 	uint16_t v_rotor_x_adc2;
+	uint16_t v_rotor_x_adc3;
 	uint16_t v_rotor_y_adc1;
 	uint16_t v_rotor_y_adc2;
+	//extra, needed?
 }regular_adc_conversions;
 
 typedef struct {
-	uint16_t temp_adc1;
+	uint16_t v_bemf_adc1;
 	uint16_t temp_adc2;
-	uint16_t v_dcbus_adc1;
-	uint16_t v_dcbus_adc2;
-	uint16_t i_dcbus_adc1;
-	uint16_t i_dcbus_adc2;
-}injected_dc_conversions;
+	uint16_t v_dcbus_adc3;
+}injected_adc_conversions;
 
-extern uint32_t _sidata;
 extern uint32_t _sdata;
-extern uint32_t _edata;
+extern uint32_t _sidata;
+extern uint32_t _eidata;//correctly placed in linker?
 extern uint32_t _sbss;
 extern uint32_t _ebss;
 extern uint32_t _sccmram;
 extern uint32_t _svtflash;
-extern uint32_t _evtflash;
+extern uint32_t _evtflash;//provides in linker?
 
-
-//constants, const gets placed in text! can be changed in linker(relation to literals?)
-const float mtpa_lut[][1];//datatype?
-
-const uint32_t rotary_resolver_correction_lut[];//datatype?
-
-const vector switch_state_vectors[] = { {0,1},
-										{sin60, cos60},
-										{sin120, cos120},
-										{0,-1},
-										{-sin60, -cos60},
-										{-sin120,-cos120} };//index 0 is coil a high, rest off, increasing the index sees the resultant magnetic field progress clockwise
-
-//variables set at init
+//variables set at init, as variables?
 float max_speed;
 float max_current;
 float ov_lockout;
 float uv_lockout;
 float ov_lockout_release;
 float uv_lockout_release;//floats?
-uint8_t n_polepairs_per_poles_sense_magnet;//pairs!
-float torque_per_amp;
+uint8_t n_polepairs_per_pairs_sense_magnet;//pairs!
 
 uint8_t faultcodes[8];//flash eeprom emulation
 uint8_t faultcodes_index;
@@ -127,32 +124,38 @@ float i_a;
 float i_b;
 float i_c;
 float angle_advance;
-float prev_speed_per_amp;
+float prev_torque_per_amp;
+float torque_per_amp;
 ufix32 prev_rotor_e_pos;
 ufix32 rotor_e_pos;
-ufix32 speed;										//be mindful when multiplying fixed point numbers!
+//somedatatype speed;
+bool commutating;
+bool sensorless;
 
 volatile float requested_current;
-volatile regular_adc_conversions adc_circ_buffer[n_samples] __attribute__ ((aligned (2)));//align on 4 bytes?, array indexing get optimized away when size is 1?
+volatile regular_adc_conversions adc_circ_buffer[n_samples] ram_bank_2 align_2;// array indexing get optimized away when size is 1?, deine align atribute?
 
 //prototypes
-void init_system(void);
+void no_wrapper init_system(void);//does no_wrapper do what i think it does here?
 void main(void);
+void copy_mem_section(uint32_t* begin_dest, uint32_t* begin_source, uint32_t* end_source);
+void zero_mem_section(uint32_t* begin_dest, uint32_t* end_dest);
 void wait(uint32_t ticks);
 void calibrate_encoder(void);
 ufix32 query_encoder_table(ufix32 pos);
-float query_mtpa_table(ufix32 speed, float current);
 void process_data(void);
 vector_mag_ang calculate_desired_current(void);
-void svm_correct_current_towards(vector_mag_ang);
-void stator_field_controll(void);
+void svm_correct_current_towards(vector_mag_ang);//inline these functions?, what will i then do for the calibrate encoder function?
 void optimize_advance_angle(void);
+void write_to_flash(uint32_t* data_start, uint32_t* dest_start, uint16_t length);
 
+extern void ADC_IRQHandler(void);
 extern void TIM2_IRQHandler(void);
-extern void TIM3_IRQHandler(void);
-extern void TIM5_IRQHandler(void);
+extern void TIM4_IRQHandler(void);
 
-void init_system(){
+void no_wrapper init_system(){
+	//cant use stack here
+
 	//setup system clocks
 	//enable HSE
 	RCC->CR = RCC_CR_HSION & RCC_CR_HSEON;
@@ -173,18 +176,12 @@ void init_system(){
 	//wait till PLL is used as system clock source
 	while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL){}
 
-	//copy the data segment into ram
-	uint32_t *src, *dst;
-	src = &_sidata;
-	dst = &_sdata;
-	while(dst < &_edata){
-		*(dst++) = *(src++);
-	}
-	//zero the bss segment
-	dst = &_sbss;
-	while(dst < &_ebss){
-		*(dst++) = 0;
-	}
+	//initialize ram
+	copy_mem_section(&_sdata, &_sidata, &_eidata);
+	//zero out uninitialized variables
+	zero_mem_section(&_sbss, &_ebss);
+
+    //bank2 isnt initialized or zeroed out!
 
 	//setup pvd
 	PWR->CR = PWR_CR_VOS_0 & PWR_CR_PVDE & (0b110<<5);
@@ -199,19 +196,15 @@ void init_system(){
 	//configure peripheral clocks
 	RCC->AHB1ENR = RCC_AHB1ENR_GPIOAEN & RCC_AHB1ENR_CCMDATARAMEN & RCC_AHB1ENR_DMA2EN;
 	RCC->APB1ENR = RCC_APB1ENR_TIM2EN & RCC_APB1ENR_TIM3EN & RCC_APB1ENR_TIM4EN;
-	RCC->APB2ENR = RCC_APB2ENR_TIM1EN & RCC_APB2ENR_USART1EN & RCC_APB2ENR_ADC1EN & RCC_APB2ENR_ADC2EN;
+	RCC->APB2ENR = RCC_APB2ENR_TIM1EN & RCC_APB2ENR_USART1EN & RCC_APB2ENR_ADC1EN & RCC_APB2ENR_ADC2EN;//add others
 
 	//copy vector table to ccram
-	src = &_svtflash;
-	dst = &_sccmram;
-	while(src < &_evtflash){
-		*(dst++) = *(src++);
-	}
+	copy_mem_section(&_sccmram, &_svtflash, &_evtflash);
+
+	//ccram isnt initialized or zeroed out!
 
 	//use vector table in ccram
 	SCB->VTOR = &_sccmram;
-
-	//turn on/off peripherals?
 
 	//setup gpio
 //	GPIOA->MODER;//function
@@ -230,45 +223,56 @@ void init_system(){
 
 	//safety checks
 
-	//setup adc
+	//setup adc, basically redo these, order
 	ADC->CCR = (0b10 << 16) & (0b10 << 14) & ADC_CCR_DMA & 0b101;//combined regular and injected mode?
-	ADC1->CR1 = ADC_CR1_AWDEN & ADC_CR1_AWDSGL & ADC_CR1_SCAN & ADC_CR1_AWDIE & 0;
+
+	ADC1->CR1 = ADC_CR1_AWDEN & ADC_CR1_AWDSGL & ADC_CR1_SCAN & ADC_CR1_AWDIE & 0;//set anawd on cur a
 	ADC1->CR2 = ADC_CR2_CONT & ADC_CR2_ADON;
+
 	ADC1->SMPR1;
 	ADC1->HTR;
 	ADC1->LTR;
 	ADC1->SQR1 = ((sizeof(regular_adc_conversions)/sizeof(uint16_t)/2)<<20);
 	ADC1->SQR3;
-	//ADC2;
+	ADC1->JSQR;
 
-	//setup dma
+	ADC2->CR1 = ADC_CR1_AWDEN & ADC_CR1_AWDSGL & ADC_CR1_SCAN & ADC_CR1_AWDIE & 0;//set anawd on temp
+	ADC2->CR2 = ADC_CR2_CONT & ADC_CR2_ADON;
+	ADC2->SMPR1;
+	ADC2->HTR;
+	ADC2->LTR;
+	ADC2->SQR1 = ((sizeof(regular_adc_conversions)/sizeof(uint16_t)/2)<<20);
+	ADC2->SQR3;
+	ADC2->JSQR;
+
+	//setup dma, basically redo these
+	DMA2_Stream0->PAR = &ADC->CDR;
+	DMA2_Stream0->M0AR = &adc_circ_buffer;
+	DMA2_Stream0->NDTR = 8;
+	DMA2_Stream0->CR = 0b11 << 16;
+	DMA2_Stream0->FCR = 0b101;
+	DMA2_Stream0->CR = (0b10 << 23) & (0b01 << 13) & (0b10 << 11) & DMA_SxCR_MINC & DMA_SxCR_CIRC;
+	DMA2_Stream0->CR = DMA_SxCR_EN;
 
 	//setup encoder?
 
 	//setup tim1 for deadtime
-	TIM1->CR1=0;//set deadtime prescaler
 	TIM1->CCER = TIM_CCER_CC1E & TIM_CCER_CC1NE & TIM_CCER_CC2E & TIM_CCER_CC2NE & TIM_CCER_CC3E & TIM_CCER_CC3NE;//complentary output polarity?
-	TIM1->BDTR = TIM_BDTR_MOE ;//set deadtime
-	//init override bits?
+	TIM1->BDTR = TIM_BDTR_MOE & 16;
+	TIM1->CCMR1 = 0b0100000001000000;
+	TIM1->CCMR2 = 0b0100000001000000;
 
-	//setup 40khz loop on tim2
+	//setup  peak detect / backemf timer on tim2?
 	TIM2->CR1 = TIM_CR1_CEN;
 	TIM2->DIER = TIM_DIER_UIE;
 	TIM2->EGR = TIM_EGR_UG;
-	TIM2->PSC = 10;
-	TIM2->CCR1 = 10;
+	TIM2->PSC;
+	TIM2->CCR1;
 
-	//setup backemf timer on tim3?
-	TIM3->CR1 = TIM_CR1_CEN;
-	TIM3->DIER = TIM_DIER_UIE;
-	TIM3->EGR = TIM_EGR_UG;
-	TIM3->PSC = 10;
-	TIM3->CCR1 = 10;
-
-	//setup injected channels timer? on tim4?
+	//setup sensorless/hall position timer on tim 3?
 
 #ifdef track_max_speed_per_power
-	//setup best advance tracking on tim5?
+	//setup best advance tracking on tim4?
 	//100 herz?
 #endif
 
@@ -280,29 +284,46 @@ void init_system(){
 
 void main(){
 	while(1){
+		if(commutating){
+			process_data();
+			svm_correct_current_towards(calculate_desired_current());
+			//limit rate?
+		}
+	}
+}
 
+void zero_mem_section(uint32_t* begin_dest, uint32_t* end_dest){
+	while(begin_dest < end_dest){
+		*(begin_dest++) = 0;
+	}
+}
+
+void copy_mem_section(uint32_t* begin_dest, uint32_t* begin_source, uint32_t* end_source){
+	while(begin_source < end_source){
+		*(begin_dest++) = *(begin_source++);
 	}
 }
 
 void process_data(){
+	//add branch for sensorless
+	//turn of dma? or give processor higher priority
+
 	//filters and averaging
 	uint16_t raw_a = (adc_circ_buffer[0].i_a_adc1 + adc_circ_buffer[0].i_a_adc2) / 2;
-	uint16_t raw_b = (adc_circ_buffer[0].i_b_adc1 + adc_circ_buffer[0].i_b_adc2) / 2;
-	uint16_t raw_x = (adc_circ_buffer[0].v_rotor_x_adc1 + adc_circ_buffer[0].v_rotor_x_adc2) / 2;
+	uint16_t raw_b = (adc_circ_buffer[0].i_b_adc1 + adc_circ_buffer[0].i_b_adc3) / 2;
+	uint16_t raw_x = (adc_circ_buffer[0].v_rotor_x_adc2 + adc_circ_buffer[0].v_rotor_x_adc3) / 2;
 	uint16_t raw_y = (adc_circ_buffer[0].v_rotor_y_adc1 + adc_circ_buffer[0].v_rotor_y_adc2) / 2;
+
 	//decode values
-	i_a = ((float)raw_a) * current_per_count - current_midpoint;//do substraction in adc offset register(can you switch around injected and regular)?
-	i_b = ((float)raw_b) * current_per_count - current_midpoint;
-	rotor_e_pos = fix32invtan2(raw_x, raw_y) * n_polepairs_per_poles_sense_magnet;//does wraparound also work like this on multiplication?
+	i_a = ((float)raw_a) * current_per_count - current_midpoint;
+	i_b = ((float)raw_b) * current_per_count - current_midpoint;//as vars or just pass as argument?
+	rotor_e_pos = fix32invtan(raw_x / raw_y) * n_polepairs_per_pairs_sense_magnet;//does wraparound also work like this on multiplication?,check asm here
+
 	//adjusts
 	rotor_e_pos = query_encoder_table(rotor_e_pos);
-	speed = rotor_e_pos - prev_rotor_e_pos;
-	prev_rotor_e_pos = rotor_e_pos;
-    //rotor_e_pos = rotor_e_pos + speed * prop_delay;//adjust for propogation delay, this can be incoporated in the mpta lut(?), do it at all?
-}
 
-void stator_field_controll(){
-
+	//derive others
+	//calculate speed, must be filtered: only calculate once every x calls?
 }
 
 void optimize_advance_angle(){
@@ -312,20 +333,14 @@ void optimize_advance_angle(){
 vector_mag_ang calculate_desired_current(){
 	vector_mag_ang out;
 
-#ifdef track_max_speed_per_power
 	out.ang = (float)rotor_e_pos + angle_advance;
 	out.mag = requested_current * torque_per_amp;
-#else
-	out.ang = (float)rotor_e_pos + query_mtpa_table(speed, requested_current);
-	out.mag = requested_current * torque_per_amp;
-#endif
 
 	return out;
 }
 
 void svm_correct_current_towards(vector_mag_ang ref_current){
 	//calculate the third coil current
-
 	i_c = -i_a - i_b;
 
 	//place currents in space
@@ -345,17 +360,20 @@ void svm_correct_current_towards(vector_mag_ang ref_current){
 	cur_total.x = cur_a.x + cur_b.x + cur_c.x;
 	cur_total.y = cur_a.y + cur_b.y + cur_c.y;
 
-	struct twofloats sine_cosine = fsine_cosine(ref_current.ang);
+	sine_cosine_struct sine_cosine = fsine_cosine(ref_current.ang);
 	vector ref;
-	ref.x = sine_cosine.value0 * ref_current.mag;
-	ref.y = sine_cosine.value1 * ref_current.mag;
+	ref.x = sine_cosine.sine * ref_current.mag;
+	ref.y = sine_cosine.cosine * ref_current.mag;
 
 	//get error
 	vector error;
 	error.x = ref.x - cur_total.x;
 	error.y = ref.y - cur_total.y;
 
-	//ignore if error is too small?
+	//ignore if error is too small
+	if (error.x*error.x + error.y*error.y < min_err_commutation){
+		return;
+	}
 
 	//get best action
 	uint8_t index_best = 0;
@@ -378,20 +396,17 @@ void svm_correct_current_towards(vector_mag_ang ref_current){
 void calibrate_encoder(){
 	//offload (parts) to pc?
 	vector_mag_ang follow_field;
-	follow_field.mag = 20;
+	follow_field.mag = 15;
 	while(follow_field.ang < 0.8){
-		follow_field.ang += 0.005;
-		svm_correct_current_towards(follow_field);// or commutate on timer?
-		wait(10);//values!?
+		follow_field.ang += 0.0001;
+		process_data();
+		svm_correct_current_towards(follow_field);
 		//record data
 	}
 }
 
-float query_mtpa_table(ufix32 speed, float current){
-	return 0;
-}
 
-ufix32 query_encoder_table(ufix32 pos){
+ufix32 query_encoder_table(ufix32 pos){// as asm function?
 	return pos;
 }
 
@@ -399,16 +414,39 @@ void wait(uint32_t ticks){
 
 }
 
-void TIM2_IRQHandler(){
-	//turn off dma
-	process_data();
-	svm_correct_current_towards(calculate_desired_current());
+void write_to_flash(uint32_t* data_start, uint32_t* dest_start, uint16_t length){
+
 }
 
-void TIM3_IRQHandler(){
-	//dma?
+void ADC_IRQHandler(){
+	//find out what triggered the interrupt
+}
+
+void TIM2_IRQHandler(){
+	// lower the amount of calls when not sensorless?
+
+	uint16_t prev_raw_bemf = 2^16;
+	//float coils
+	TIM1->CCMR1 = 0b0100000001000000;
+	TIM1->CCMR2 = 0b0100000001000000;
+	wait(10);
+
 	//wait for peak
-	stator_field_controll();
+	while(ADC1->SR & ADC_SR_JEOC){
+		uint16_t raw_bemf = ADC1->DR;
+		ADC1->CR2 |= ADC_CR2_SWSTART;//bitbanding?, all adcs in synch?
+		if(prev_raw_bemf - raw_bemf > peak_detection_level){
+			break;//doest this break the upper loop?
+		}
+		prev_raw_bemf = raw_bemf;
+	}
+
+	//adjust postion timer prescaler if sensorless
+
+	//do troque estimation
+
+	//ensure new reg samples are available
+	wait(10);//ensure in a different way?
 }
 
 #ifdef track_max_speed_per_power
