@@ -5,7 +5,9 @@
 
 //todos, questions
 
-//field strength based on calulated speed?
+//limit rate or skip on small error?
+//field weakening, how to console this with mtpa?
+//max speed per amp tracking sould be max acceleration per amp tracking when not at steady speed(trasition?)(?)
 //auto find phase ordering, polartity
 //reverse?
 //back emf sensing?
@@ -49,7 +51,7 @@
 #define align_2 __attribute__ ((aligned (2)))
 #define no_wrapper __attribute__((naked))//do this differently(?)
 
-#define min_err_commutation 0//square of current
+#define min_err_commutation 0//square of current!
 #define peak_detection_window 1
 #define peak_detection_level 1
 #define first_time_peak_detection_window 1
